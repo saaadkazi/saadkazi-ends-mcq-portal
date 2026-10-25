@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { OptionId, QuizEngine } from '../types/quiz';
+import { useAnswerSound } from '../hooks/useAnswerSound';
 import { QuizHeader } from '../components/quiz/QuizHeader';
 import { QuestionCard } from '../components/quiz/QuestionCard';
 import { OptionList } from '../components/quiz/OptionList';
@@ -25,6 +26,8 @@ export const QuizView: React.FC<QuizViewProps> = ({ engine }) => {
     resetToWelcome
   } = engine;
 
+  const { isMuted, toggleMute, playAnswerSound } = useAnswerSound();
+
   // Local pending selection before submission
   const [selectedOptionId, setSelectedOptionId] = useState<OptionId | null>(null);
 
@@ -49,7 +52,11 @@ export const QuizView: React.FC<QuizViewProps> = ({ engine }) => {
 
   const handleSubmit = () => {
     if (selectedOptionId && !isAnswerSubmitted) {
-      submitAnswer(selectedOptionId);
+      const isCorrect = selectedOptionId === currentQuestion.correctOptionId;
+      const wasAccepted = submitAnswer(selectedOptionId);
+      if (wasAccepted) {
+        playAnswerSound(isCorrect);
+      }
     }
   };
 
@@ -73,6 +80,8 @@ export const QuizView: React.FC<QuizViewProps> = ({ engine }) => {
         totalQuestions={questions.length}
         correctCount={stats.correctCount}
         onQuit={resetToWelcome}
+        isMuted={isMuted}
+        onToggleMute={toggleMute}
       />
 
       <QuestionCard question={currentQuestion} questionNumber={currentIndex + 1} />

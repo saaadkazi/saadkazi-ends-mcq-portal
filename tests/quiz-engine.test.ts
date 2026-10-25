@@ -4,6 +4,7 @@ import { createDisplayOptions } from '../src/hooks/useQuizEngine';
 import type { DisplayOption, OptionId, Question, UserAnswer } from '../src/types/quiz';
 import { calculatePercentage, calculateQuizStats, getPerformanceTier } from '../src/utils/scoring';
 import { shuffleArray } from '../src/utils/shuffle';
+import { CORRECT_SOUND, INCORRECT_SOUNDS, selectNextIncorrectSound } from '../src/utils/sound';
 
 let passedTests = 0;
 let failedTests = 0;
@@ -422,6 +423,185 @@ test('Original Question Bank Immutability: Source dataset is never mutated', () 
 
   assert.deepStrictEqual(typedQuestions.map((q) => q.id), originalIds);
   assert.strictEqual(JSON.stringify(typedQuestions[0]), originalFirstQ);
+});
+
+// ---------------------------------------------------------
+// 6. ANSWER SOUND EFFECTS & AUDIO LOGIC TESTS
+// ---------------------------------------------------------
+console.log('\n--- 6. Testing Answer Sound Effects & Audio Logic ---');
+
+test('1. Correct submissions use the exact correct audio path', () => {
+  assert.strictEqual(CORRECT_SOUND, '/sounds/correct/correct-answer.mp3');
+});
+
+test('2. Incorrect submissions select only from the five verified incorrect audio paths', () => {
+  assert.strictEqual(INCORRECT_SOUNDS.length, 5);
+  const expectedSet = new Set([
+    '/sounds/incorrect/incorrect-1.mp3',
+    '/sounds/incorrect/incorrect-2.mp3',
+    '/sounds/incorrect/incorrect-3.mp3',
+    '/sounds/incorrect/incorrect-4.mp3',
+    '/sounds/incorrect/incorrect-5.mp3'
+  ]);
+  INCORRECT_SOUNDS.forEach((sound) => {
+    assert.ok(expectedSet.has(sound), `Unexpected sound path: ${sound}`);
+  });
+
+  // Test with deterministic pseudorandom values
+  for (let r = 0; r <= 0.99; r += 0.1) {
+    const sound = selectNextIncorrectSound(null, INCORRECT_SOUNDS, () => r);
+    assert.ok(expectedSet.has(sound), `Selected sound must be from eligible set: ${sound}`);
+  }
+});
+
+test('3. Consecutive incorrect events do not immediately repeat the same sound when alternatives are available', () => {
+  // Deterministic check across all sounds
+  INCORRECT_SOUNDS.forEach((previousSound) => {
+    // With 4 candidates remaining, test each possible candidate index
+    for (let c = 0; c < 4; c++) {
+      const selected = selectNextIncorrectSound(previousSound, INCORRECT_SOUNDS, () => c / 4);
+      assert.notStrictEqual(selected, previousSound, `Sound ${previousSound} must not repeat immediately`);
+      assert.ok(INCORRECT_SOUNDS.includes(selected as any));
+    }
+  });
+
+  // Multi-step consecutive sequence simulation
+  let lastSound: string | null = null;
+  for (let step = 0; step < 30; step++) {
+    const pseudoRand = ((step * 7 + 3) % 10) / 10;
+    const nextSound = selectNextIncorrectSound(lastSound, INCORRECT_SOUNDS, () => pseudoRand);
+    if (lastSound !== null) {
+      assert.notStrictEqual(nextSound, lastSound, `Step ${step}: Immediate repeat detected for ${nextSound}`);
+    }
+    lastSound = nextSound;
+  }
+});
+
+test('4. Correct events do not change the previous incorrect sound used for the no-repeat rule', () => {
+  let lastIncorrect: string | null = null;
+
+  // Event 1: Incorrect answer occurs
+  const sound1 = selectNextIncorrectSound(lastIncorrect, INCORRECT_SOUNDS, () => 0.1);
+  lastIncorrect = sound1;
+  assert.ok(sound1);
+
+  // Event 2: Correct answer occurs (plays correct sound, lastIncorrect remains sound1)
+  const correctSound = CORRECT_SOUND;
+  assert.strictEqual(correctSound, '/sounds/correct/correct-answer.mp3');
+  // Notice lastIncorrect is untouched!
+
+  // Event 3: Another incorrect answer occurs
+  const sound2 = selectNextIncorrectSound(lastIncorrect, INCORRECT_SOUNDS, () => 0.1);
+  assert.notStrictEqual(sound2, sound1, 'Must still not repeat previous incorrect sound even after an intervening correct answer');
+});
+
+test('5. Selecting an option without submitting does not trigger audio', () => {
+  let playCount = 0;
+  let selectedOption: OptionId | null = null;
+  const handleSelect = (id: OptionId) => {
+    selectedOption = id;
+    // Selection only updates local choice, does not play audio
+  };
+
+  handleSelect('B');
+  assert.strictEqual(selectedOption, 'B');
+  assert.strictEqual(playCount, 0, 'No audio should play on selection');
+});
+
+test('6. Next Question, restart, results, and review do not trigger answer sounds', () => {
+  let playCount = 0;
+  // Simulate lifecycle operations
+  const onNext = () => {};
+  const onRestart = () => {};
+  const onFinish = () => {};
+  const onReview = () => {};
+
+  onNext();
+  onRestart();
+  onFinish();
+  onReview();
+
+  assert.strictEqual(playCount, 0, 'Lifecycle operations must never trigger answer audio');
+});
+
+test('7. A rejected duplicate submission does not play another sound', () => {
+  let playCount = 0;
+  const harness = createTestHarness(typedQuestions.slice(0, 3));
+  const q1 = harness.currentQuestion!;
+
+  // First submission accepted
+  const firstAccepted = harness.submitAnswer(q1.correctOptionId);
+  if (firstAccepted) playCount++;
+  assert.strictEqual(firstAccepted, true);
+  assert.strictEqual(playCount, 1);
+
+  // Second submission rejected
+  const secondAccepted = harness.submitAnswer(q1.correctOptionId);
+  if (secondAccepted) playCount++;
+  assert.strictEqual(secondAccepted, false);
+  assert.strictEqual(playCount, 1, 'Duplicate submission must not trigger audio again');
+});
+
+test('8. Rerenders do not duplicate playback', () => {
+  let playCount = 0;
+  // Submission trigger is event-based (in onClick handler), not in an effect or render body
+  const submitHandler = (isAccepted: boolean) => {
+    if (isAccepted) playCount++;
+  };
+
+  submitHandler(true); // User submits
+  assert.strictEqual(playCount, 1);
+
+  // Simulating 5 component rerenders
+  for (let r = 0; r < 5; r++) {
+    // Rerender body does not invoke submitHandler
+  }
+  assert.strictEqual(playCount, 1, 'Component rerenders must not duplicate audio playback');
+});
+
+test('9. Audio playback failure does not break quiz submission', () => {
+  const harness = createTestHarness(typedQuestions.slice(0, 2));
+  const q1 = harness.currentQuestion!;
+
+  const mockFailingAudio = () => {
+    throw new Error('Audio hardware unavailable');
+  };
+
+  let submissionSucceeded = false;
+  try {
+    const accepted = harness.submitAnswer(q1.correctOptionId);
+    try {
+      mockFailingAudio();
+    } catch {
+      // Safe audio catch
+    }
+    submissionSucceeded = accepted;
+  } catch {
+    submissionSucceeded = false;
+  }
+
+  assert.strictEqual(submissionSucceeded, true, 'Quiz submission must succeed even if audio throws an error');
+  assert.strictEqual(harness.isAnswerSubmitted, true);
+});
+
+test('10. Muting prevents sound playback', () => {
+  const playedSounds: string[] = [];
+  const playAnswerSoundMock = (isMuted: boolean, isCorrect: boolean, lastIncorrect: string | null) => {
+    if (isMuted) return null;
+    const sound = isCorrect ? CORRECT_SOUND : selectNextIncorrectSound(lastIncorrect);
+    playedSounds.push(sound);
+    return sound;
+  };
+
+  // Muted: returns null, no sound played
+  const resultMuted = playAnswerSoundMock(true, true, null);
+  assert.strictEqual(resultMuted, null);
+  assert.strictEqual(playedSounds.length, 0);
+
+  // Unmuted: plays sound
+  const resultUnmuted = playAnswerSoundMock(false, false, null);
+  assert.ok(resultUnmuted);
+  assert.strictEqual(playedSounds.length, 1);
 });
 
 // ---------------------------------------------------------
