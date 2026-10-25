@@ -1,0 +1,2302 @@
+[
+  {
+    "id": 1,
+    "question": "Which of the following is considered an intrinsic reward (charm) of choosing entrepreneurship over salaried employment?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Guaranteed steady income from day one"
+      },
+      {
+        "id": "B",
+        "text": "Complete immunity from business losses"
+      },
+      {
+        "id": "C",
+        "text": "High degree of autonomy and decision-making independence"
+      },
+      {
+        "id": "D",
+        "text": "Fixed 8-hour workday schedules"
+      }
+    ],
+    "correctOptionId": "C"
+  },
+  {
+    "id": 2,
+    "question": "The scope of an enterprise targeting exclusively local geographical boundaries is primarily constrained by:",
+    "options": [
+      {
+        "id": "A",
+        "text": "International tariffs"
+      },
+      {
+        "id": "B",
+        "text": "Foreign exchange rate fluctuations"
+      },
+      {
+        "id": "C",
+        "text": "Local purchasing power and narrow consumer demographics"
+      },
+      {
+        "id": "D",
+        "text": "Global intellectual property treaties"
+      }
+    ],
+    "correctOptionId": "C"
+  },
+  {
+    "id": 3,
+    "question": "An entrepreneur who continues to pursue market validation despite repeated initial product rejections demonstrates:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Consistency"
+      },
+      {
+        "id": "B",
+        "text": "Persistence"
+      },
+      {
+        "id": "C",
+        "text": "Assertiveness"
+      },
+      {
+        "id": "D",
+        "text": "Information seeking"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 4,
+    "question": "An entrepreneur conducting extensive customer interviews and competitive benchmarking prior to product launch exemplifies which trait?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Persuasion"
+      },
+      {
+        "id": "B",
+        "text": "Information seeking"
+      },
+      {
+        "id": "C",
+        "text": "Risk avoidance"
+      },
+      {
+        "id": "D",
+        "text": "Independent decision making"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 5,
+    "question": "How does a 'calculated risk-taker' differ from a 'gambler'?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A calculated risk-taker avoids any possibility of loss"
+      },
+      {
+        "id": "B",
+        "text": "A calculated risk-taker assesses probabilities, prepares contingencies, and mitigates identifiable exposure"
+      },
+      {
+        "id": "C",
+        "text": "A calculated risk-taker leaves results to market luck"
+      },
+      {
+        "id": "D",
+        "text": "A calculated risk-taker only invests non-equity capital"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 6,
+    "question": "Which entrepreneurial trait involves standing firm on business terms while maintaining respect for the counterparty?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Assertiveness"
+      },
+      {
+        "id": "B",
+        "text": "Aggressiveness"
+      },
+      {
+        "id": "C",
+        "text": "Submissiveness"
+      },
+      {
+        "id": "D",
+        "text": "Rigidness"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 7,
+    "question": "A business entity that purchases finished goods from producers in bulk and resells them in smaller quantities to retailers is classified as a:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Manufacturing enterprise"
+      },
+      {
+        "id": "B",
+        "text": "Service enterprise"
+      },
+      {
+        "id": "C",
+        "text": "Trading (Wholesale) enterprise"
+      },
+      {
+        "id": "D",
+        "text": "Ancillary industrial unit"
+      }
+    ],
+    "correctOptionId": "C"
+  },
+  {
+    "id": 8,
+    "question": "Which of the following operations is classified under a 'Service Enterprise'?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Injection molding workshop producing plastic bottles"
+      },
+      {
+        "id": "B",
+        "text": "Mobile phone repair and software troubleshooting center"
+      },
+      {
+        "id": "C",
+        "text": "Ready-made garment wholesale distributor"
+      },
+      {
+        "id": "D",
+        "text": "Agro-processing sugar refinery"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 9,
+    "question": "A manufacturing enterprise is characterized by:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Physical transformation of raw materials into finished utility products"
+      },
+      {
+        "id": "B",
+        "text": "Zero inventory management requirements"
+      },
+      {
+        "id": "C",
+        "text": "Purely intangible customer deliverables"
+      },
+      {
+        "id": "D",
+        "text": "Complete absence of plant and machinery investments"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 10,
+    "question": "What is a key disadvantage faced by an entrepreneur during the early stages of a venture?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Excessively high dividends"
+      },
+      {
+        "id": "B",
+        "text": "Financial uncertainty and irregular cash flow"
+      },
+      {
+        "id": "C",
+        "text": "Lack of business control"
+      },
+      {
+        "id": "D",
+        "text": "Inability to introduce innovations"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 11,
+    "question": "Which enterprise type typically carries the highest inventory spoilage and holding cost risk?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Software consulting agency"
+      },
+      {
+        "id": "B",
+        "text": "Perishable food manufacturing and distribution unit"
+      },
+      {
+        "id": "C",
+        "text": "Technical training institute"
+      },
+      {
+        "id": "D",
+        "text": "Patent law consultancy"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 12,
+    "question": "When an entrepreneur learns from failures, the primary behavioral adjustment is:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Abandoning all entrepreneurial activity entirely"
+      },
+      {
+        "id": "B",
+        "text": "Refusing to adopt new technologies"
+      },
+      {
+        "id": "C",
+        "text": "Root-cause post-mortem analysis followed by strategic pivoting"
+      },
+      {
+        "id": "D",
+        "text": "Blaming market conditions without updating internal processes"
+      }
+    ],
+    "correctOptionId": "C"
+  },
+  {
+    "id": 13,
+    "question": "'Commitment to work contract' in an entrepreneurial setting means:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Passing project blame onto subcontractors"
+      },
+      {
+        "id": "B",
+        "text": "Prioritizing customer delivery and specifications even at temporary personal or operational cost"
+      },
+      {
+        "id": "C",
+        "text": "Terminating contracts whenever margin targets shrink"
+      },
+      {
+        "id": "D",
+        "text": "Delegating all accountability to shop-floor technicians"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 14,
+    "question": "The scope of a global enterprise is enabled primarily by:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Strict reliance on local currency credit lines"
+      },
+      {
+        "id": "B",
+        "text": "Digital connectivity, scalable logistics, and international trade agreements"
+      },
+      {
+        "id": "C",
+        "text": "Limiting marketing to vernacular print publications"
+      },
+      {
+        "id": "D",
+        "text": "Disregarding international quality certifications"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 15,
+    "question": "An entrepreneur negotiating payment terms with suppliers without yielding critical operational liquidity is practicing:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Consistency"
+      },
+      {
+        "id": "B",
+        "text": "Persuasion and business communication"
+      },
+      {
+        "id": "C",
+        "text": "High risk avoidance"
+      },
+      {
+        "id": "D",
+        "text": "Production planning"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 16,
+    "question": "Which of the following is an example of strategic risk in a startup?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A power outage on the factory floor for 2 hours"
+      },
+      {
+        "id": "B",
+        "text": "Entering a saturated market with an obsolete technological architecture"
+      },
+      {
+        "id": "C",
+        "text": "Minor delay in raw material freight due to local traffic"
+      },
+      {
+        "id": "D",
+        "text": "Temporary clerical errors in invoice ledger entries"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 17,
+    "question": "A trading enterprise generally requires:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Extensive heavy factory fabrication machinery"
+      },
+      {
+        "id": "B",
+        "text": "Working capital for inventory and efficient distribution channels"
+      },
+      {
+        "id": "C",
+        "text": "Decades of proprietary laboratory R&D"
+      },
+      {
+        "id": "D",
+        "text": "High patenting and copyright expenditures"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 18,
+    "question": "Self-analysis tools such as SWOT analysis help prospective entrepreneurs identify:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Universal product retail prices"
+      },
+      {
+        "id": "B",
+        "text": "Internal strengths/weaknesses and external opportunities/threats"
+      },
+      {
+        "id": "C",
+        "text": "Direct stock market valuations"
+      },
+      {
+        "id": "D",
+        "text": "Statutory tax brackets of suppliers"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 19,
+    "question": "In contrast to an employee, an entrepreneur's financial returns are:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Fixed and protected by labor acts"
+      },
+      {
+        "id": "B",
+        "text": "Residual, uncapped, and performance-dependent"
+      },
+      {
+        "id": "C",
+        "text": "Non-taxable"
+      },
+      {
+        "id": "D",
+        "text": "Guaranteed on the final day of each calendar month"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 20,
+    "question": "An entrepreneur demonstrating 'Initiative' is one who:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Waits for client instructions before innovating"
+      },
+      {
+        "id": "B",
+        "text": "Takes proactive actions before being forced to by events or competitors"
+      },
+      {
+        "id": "C",
+        "text": "Follows industry standards strictly without variation"
+      },
+      {
+        "id": "D",
+        "text": "Avoids introducing any untried products"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 21,
+    "question": "Which risk type stems directly from fluctuations in interest rates, credit availability, and currency exchange?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Environmental risk"
+      },
+      {
+        "id": "B",
+        "text": "Financial risk"
+      },
+      {
+        "id": "C",
+        "text": "Operational risk"
+      },
+      {
+        "id": "D",
+        "text": "Legal risk"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 22,
+    "question": "A service enterprise differs from a manufacturing enterprise primarily because services are:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Tangible, separable, and storable"
+      },
+      {
+        "id": "B",
+        "text": "Intangible, inseparable, variable, and perishable"
+      },
+      {
+        "id": "C",
+        "text": "Dependent strictly on automated assembly lines"
+      },
+      {
+        "id": "D",
+        "text": "Free from customer interaction"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 23,
+    "question": "Creative problem solving in entrepreneurship helps founders:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Evade commercial taxes legally"
+      },
+      {
+        "id": "B",
+        "text": "Identify novel, resource-efficient solutions to customer pain points"
+      },
+      {
+        "id": "C",
+        "text": "Eliminate all market competitors instantly"
+      },
+      {
+        "id": "D",
+        "text": "Disregard accounting balance sheets"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 24,
+    "question": "Independent decision-making requires an entrepreneur to:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Reject all advice from subject matter experts"
+      },
+      {
+        "id": "B",
+        "text": "Assume sole responsibility for directional choices after evaluating data"
+      },
+      {
+        "id": "C",
+        "text": "Delay all decisions until unanimous agreement is achieved"
+      },
+      {
+        "id": "D",
+        "text": "Shift final accountability to board advisors"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 25,
+    "question": "Technological obsolescence is a major risk categorized under:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Operational/Technical risk"
+      },
+      {
+        "id": "B",
+        "text": "Statutory compliance risk"
+      },
+      {
+        "id": "C",
+        "text": "Ethical risk"
+      },
+      {
+        "id": "D",
+        "text": "Employee welfare risk"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 26,
+    "question": "An organization's unique bundle of skills, technologies, and processes that provides a defensible competitive edge is called:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Plant layout"
+      },
+      {
+        "id": "B",
+        "text": "Core competence"
+      },
+      {
+        "id": "C",
+        "text": "Ancillary dependency"
+      },
+      {
+        "id": "D",
+        "text": "Variable margin"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 27,
+    "question": "What is the correct sequence of stages in the standard Product Life Cycle (PLC)?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Growth -> Introduction -> Decline -> Maturity"
+      },
+      {
+        "id": "B",
+        "text": "Introduction -> Growth -> Maturity -> Decline"
+      },
+      {
+        "id": "C",
+        "text": "Maturity -> Growth -> Introduction -> Decline"
+      },
+      {
+        "id": "D",
+        "text": "Introduction -> Maturity -> Growth -> Decline"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 28,
+    "question": "In the Product Mortality Curve, the sharpest reduction in ideas occurs during which phase?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Commercial product roll-out"
+      },
+      {
+        "id": "B",
+        "text": "Initial idea screening and concept evaluation"
+      },
+      {
+        "id": "C",
+        "text": "Mass warehouse distribution"
+      },
+      {
+        "id": "D",
+        "text": "Post-launch customer service"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 29,
+    "question": "Which stage of the Technology Life Cycle (TLC) requires maximum R&D expenditure with minimal or zero immediate revenue?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Bleeding Edge / Research & Development phase"
+      },
+      {
+        "id": "B",
+        "text": "Growth / Ascending phase"
+      },
+      {
+        "id": "C",
+        "text": "Mature plateau phase"
+      },
+      {
+        "id": "D",
+        "text": "Substitution / Decay phase"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 30,
+    "question": "Which factor is most critical when selecting an industrial location for a heavy cement manufacturing plant?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Proximity to luxury lifestyle retail malls"
+      },
+      {
+        "id": "B",
+        "text": "Proximity to limestone raw material reserves and heavy rail transport infrastructure"
+      },
+      {
+        "id": "C",
+        "text": "Availability of ultra-high-speed fiber broadband only"
+      },
+      {
+        "id": "D",
+        "text": "Downtown pedestrian foot traffic"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 31,
+    "question": "In a manufacturing plant, efficient 'Material Handling' layout primarily aims to:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase the distance materials travel inside the shop floor"
+      },
+      {
+        "id": "B",
+        "text": "Minimize material travel time, bottlenecks, and internal transport costs"
+      },
+      {
+        "id": "C",
+        "text": "Maximize manual labor usage over automated rollers"
+      },
+      {
+        "id": "D",
+        "text": "Store raw inventory directly adjacent to administrative executive suites"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 32,
+    "question": "What is the primary purpose of a pilot questionnaire test in a market survey?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Finalizing fiscal year corporate tax filings"
+      },
+      {
+        "id": "B",
+        "text": "Identifying ambiguous, confusing, or leading questions before full deployment"
+      },
+      {
+        "id": "C",
+        "text": "Direct selling of inventory units to survey takers"
+      },
+      {
+        "id": "D",
+        "text": "Fulfilling factory labor compliance norms"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 33,
+    "question": "Sampling where every individual in the defined population has a known, non-zero probability of selection is:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Convenience sampling"
+      },
+      {
+        "id": "B",
+        "text": "Quota sampling"
+      },
+      {
+        "id": "C",
+        "text": "Probability / Random sampling"
+      },
+      {
+        "id": "D",
+        "text": "Judgemental sampling"
+      }
+    ],
+    "correctOptionId": "C"
+  },
+  {
+    "id": 34,
+    "question": "What does the acronym MCED stand for in Maharashtra's industrial ecosystem?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Municipal Corporation for Electronic Development"
+      },
+      {
+        "id": "B",
+        "text": "Maharashtra Centre for Entrepreneurship Development"
+      },
+      {
+        "id": "C",
+        "text": "Mega Capital for Enterprise Distribution"
+      },
+      {
+        "id": "D",
+        "text": "Maharashtra Council for Educational Degrees"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 35,
+    "question": "NI-MSME (National Institute for Micro, Small and Medium Enterprises) is an apex national institute located at:",
+    "options": [
+      {
+        "id": "A",
+        "text": "New Delhi"
+      },
+      {
+        "id": "B",
+        "text": "Hyderabad"
+      },
+      {
+        "id": "C",
+        "text": "Mumbai"
+      },
+      {
+        "id": "D",
+        "text": "Kolkata"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 36,
+    "question": "Under the PMEGP scheme, what is the key financial mechanism provided to new entrepreneurs?",
+    "options": [
+      {
+        "id": "A",
+        "text": "100% venture capital buyout"
+      },
+      {
+        "id": "B",
+        "text": "Credit-linked capital subsidy for project setup"
+      },
+      {
+        "id": "C",
+        "text": "Unconditional interest-free corporate bonds"
+      },
+      {
+        "id": "D",
+        "text": "Direct supply of factory machinery free of cost"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 37,
+    "question": "What is the nodal implementing agency for the PMEGP scheme at the national level?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Reserve Bank of India (RBI)"
+      },
+      {
+        "id": "B",
+        "text": "Khadi and Village Industries Commission (KVIC)"
+      },
+      {
+        "id": "C",
+        "text": "Central Board of Direct Taxes (CBDT)"
+      },
+      {
+        "id": "D",
+        "text": "Securities and Exchange Board of India (SEBI)"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 38,
+    "question": "The District Industries Centre (DIC / DI) operates primarily to:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Manage international offshore stock exchanges"
+      },
+      {
+        "id": "B",
+        "text": "Provide single-window facilitation, registration, and industrial assistance at the district level"
+      },
+      {
+        "id": "C",
+        "text": "Formulate national foreign exchange policy"
+      },
+      {
+        "id": "D",
+        "text": "Supervise commercial airline routes"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 39,
+    "question": "Primary market research data is collected through:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Published national census archives from ten years ago"
+      },
+      {
+        "id": "B",
+        "text": "Directly administered surveys, interviews, and direct field observations"
+      },
+      {
+        "id": "C",
+        "text": "Competitor balance sheets downloaded from public libraries"
+      },
+      {
+        "id": "D",
+        "text": "Industry trade journals published five years prior"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 40,
+    "question": "Which transformation cost includes depreciation of plant machinery, electricity, and shop floor supplies?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Direct material acquisition cost"
+      },
+      {
+        "id": "B",
+        "text": "Conversion / Manufacturing overhead cost"
+      },
+      {
+        "id": "C",
+        "text": "Corporate income tax expenses"
+      },
+      {
+        "id": "D",
+        "text": "Shareholder dividend payout"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 41,
+    "question": "In the New Product Development (NPD) funnel, what stage immediately follows 'Concept Generation and Screening'?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Commercial product retirement"
+      },
+      {
+        "id": "B",
+        "text": "Concept Development and Testing"
+      },
+      {
+        "id": "C",
+        "text": "Nationwide mass media marketing"
+      },
+      {
+        "id": "D",
+        "text": "Liquidation of obsolete inventories"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 42,
+    "question": "Which location factor dominates for an e-commerce fast-delivery grocery hub?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Remote rural wilderness with zero population"
+      },
+      {
+        "id": "B",
+        "text": "Dense urban neighborhood proximity to optimize the last-mile radius"
+      },
+      {
+        "id": "C",
+        "text": "Proximity to mining belts"
+      },
+      {
+        "id": "D",
+        "text": "International oceanic deep-sea ports"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 43,
+    "question": "What is a 'Closed-ended question' in a market survey questionnaire?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A question allowing unconstrained, lengthy essay answers"
+      },
+      {
+        "id": "B",
+        "text": "A question with predefined, standardized response choices (e.g., Likert scale, Yes/No)"
+      },
+      {
+        "id": "C",
+        "text": "A question that the respondent is legally barred from reading"
+      },
+      {
+        "id": "D",
+        "text": "An unrecorded telephonic conversation"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 44,
+    "question": "A continuous process manufacturing layout is best suited for:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Custom bespoke wedding gowns"
+      },
+      {
+        "id": "B",
+        "text": "Standardized chemical petroleum refining and bulk sugar production"
+      },
+      {
+        "id": "C",
+        "text": "Fine handmade wooden sculptures"
+      },
+      {
+        "id": "D",
+        "text": "Customized interior decoration projects"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 45,
+    "question": "Which agency promotes non-farm, rural, and traditional craft-based micro-enterprises in India?",
+    "options": [
+      {
+        "id": "A",
+        "text": "ISRO"
+      },
+      {
+        "id": "B",
+        "text": "KVIC"
+      },
+      {
+        "id": "C",
+        "text": "SEBI"
+      },
+      {
+        "id": "D",
+        "text": "TRAI"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 46,
+    "question": "Qualitative data analysis in market research focuses on:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mean, median, standard deviation, and variance calculations"
+      },
+      {
+        "id": "B",
+        "text": "Consumer sentiments, perceptions, underlying motivations, and thematic feedback"
+      },
+      {
+        "id": "C",
+        "text": "Purely double-entry balance sheet ledgers"
+      },
+      {
+        "id": "D",
+        "text": "Automated sensor voltage readings"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 47,
+    "question": "When selecting a product, the 'degree of value addition' represents:",
+    "options": [
+      {
+        "id": "A",
+        "text": "The final selling price divided by the number of factory employees"
+      },
+      {
+        "id": "B",
+        "text": "The difference between the cost of raw material inputs and the market price of the finished product"
+      },
+      {
+        "id": "C",
+        "text": "Total accumulated commercial tax dues"
+      },
+      {
+        "id": "D",
+        "text": "Total machine shipping weight"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 48,
+    "question": "In the Maturity stage of the Product Life Cycle, marketing strategy shifts toward:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Creating baseline category awareness among innovators"
+      },
+      {
+        "id": "B",
+        "text": "Defending market share, brand differentiation, and optimizing margins against stiff competition"
+      },
+      {
+        "id": "C",
+        "text": "Ceasing all marketing and withdrawing from sales distribution"
+      },
+      {
+        "id": "D",
+        "text": "Tripling production costs"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 49,
+    "question": "Which of the following is an example of a convenience sampling method?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Selecting every 10th name on a verified voter registry"
+      },
+      {
+        "id": "B",
+        "text": "Interviewing passersby at an entrance of an accessible shopping mall"
+      },
+      {
+        "id": "C",
+        "text": "Using stratified population cohorts across five income bands"
+      },
+      {
+        "id": "D",
+        "text": "Running computer-generated random number generators across all phone numbers"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 50,
+    "question": "Innovation in product modification involves:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Copying a competitor's exact trademark illegally"
+      },
+      {
+        "id": "B",
+        "text": "Improving functional utility, energy efficiency, materials, or UX of an existing product"
+      },
+      {
+        "id": "C",
+        "text": "Freezing all design improvements indefinitely"
+      },
+      {
+        "id": "D",
+        "text": "Lowering manufacturing quality to maximize returns unilaterally"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 51,
+    "question": "According to the revised composite criteria (effective from 2020), a 'Micro' enterprise is defined by:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Investment <= Rs 1 Crore and Annual Turnover <= Rs 5 Crore"
+      },
+      {
+        "id": "B",
+        "text": "Investment <= Rs 10 Crore and Annual Turnover <= Rs 50 Crore"
+      },
+      {
+        "id": "C",
+        "text": "Investment <= Rs 50 Crore and Annual Turnover <= Rs 250 Crore"
+      },
+      {
+        "id": "D",
+        "text": "Investment <= Rs 25 Lakhs with zero turnover ceiling"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 52,
+    "question": "Under the MSME categorization criteria, what are the thresholds for a 'Small' enterprise?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Investment <= Rs 1 Crore and Turnover <= Rs 5 Crore"
+      },
+      {
+        "id": "B",
+        "text": "Investment <= Rs 10 Crore and Turnover <= Rs 50 Crore"
+      },
+      {
+        "id": "C",
+        "text": "Investment <= Rs 50 Crore and Turnover <= Rs 250 Crore"
+      },
+      {
+        "id": "D",
+        "text": "Investment <= Rs 100 Crore and Turnover <= Rs 500 Crore"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 53,
+    "question": "What are the composite classification thresholds for a 'Medium' enterprise?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Investment <= Rs 10 Crore and Turnover <= Rs 50 Crore"
+      },
+      {
+        "id": "B",
+        "text": "Investment <= Rs 50 Crore and Turnover <= Rs 250 Crore"
+      },
+      {
+        "id": "C",
+        "text": "Investment <= Rs 5 Crore and Turnover <= Rs 25 Crore"
+      },
+      {
+        "id": "D",
+        "text": "Investment <= Rs 20 Crore and Turnover <= Rs 100 Crore"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 54,
+    "question": "In the calculation of annual turnover for MSME classification, which of the following is explicitly EXCLUDED?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Total domestic retail sales"
+      },
+      {
+        "id": "B",
+        "text": "Export turnover of goods and services"
+      },
+      {
+        "id": "C",
+        "text": "Inter-state B2B sales"
+      },
+      {
+        "id": "D",
+        "text": "Online website sales"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 55,
+    "question": "An 'Ancillary Industrial Unit' is predominantly characterized by:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Direct trading of foreign consumer electronics"
+      },
+      {
+        "id": "B",
+        "text": "Supplying a substantial percentage (typically at least 50%) of its manufactured components/sub-assemblies to a parent unit"
+      },
+      {
+        "id": "C",
+        "text": "Sole operation in agro-horticultural produce"
+      },
+      {
+        "id": "D",
+        "text": "Total independence from any large-scale parent manufacturer"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 56,
+    "question": "What is the fundamental formula to calculate the Break-Even Point (BEP) in physical units?",
+    "options": [
+      {
+        "id": "A",
+        "text": "BEP (units) = Total Variable Cost / Selling Price per Unit"
+      },
+      {
+        "id": "B",
+        "text": "BEP (units) = Fixed Costs / (Selling Price per Unit - Variable Cost per Unit)"
+      },
+      {
+        "id": "C",
+        "text": "BEP (units) = Net Profit / Total Assets"
+      },
+      {
+        "id": "D",
+        "text": "BEP (units) = (Fixed Costs + Variable Costs) / Sales Revenue"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 57,
+    "question": "The difference between the Selling Price per Unit and the Variable Cost per Unit is termed:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Gross overhead"
+      },
+      {
+        "id": "B",
+        "text": "Unit contribution margin"
+      },
+      {
+        "id": "C",
+        "text": "Retained earning"
+      },
+      {
+        "id": "D",
+        "text": "Sunk investment"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 58,
+    "question": "If a company incurs Rs 2,00,000 in Fixed Costs, has a Selling Price of Rs 50 per unit, and a Variable Cost of Rs 30 per unit, what is the BEP in units?",
+    "options": [
+      {
+        "id": "A",
+        "text": "5,000 units"
+      },
+      {
+        "id": "B",
+        "text": "10,000 units"
+      },
+      {
+        "id": "C",
+        "text": "20,000 units"
+      },
+      {
+        "id": "D",
+        "text": "4,000 units"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 59,
+    "question": "What does the Break-Even Point represent for an enterprise?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The sales level where profits are maximized"
+      },
+      {
+        "id": "B",
+        "text": "The sales level where total revenue exactly equals total costs (Zero profit, zero loss)"
+      },
+      {
+        "id": "C",
+        "text": "The point where the enterprise exhausts its working capital"
+      },
+      {
+        "id": "D",
+        "text": "The statutory tax threshold"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 60,
+    "question": "How is Return on Investment (ROI) calculated?",
+    "options": [
+      {
+        "id": "A",
+        "text": "ROI = (Net Annual Profit / Total Cost of Investment) * 100"
+      },
+      {
+        "id": "B",
+        "text": "ROI = (Gross Revenue / Variable Costs) * 100"
+      },
+      {
+        "id": "C",
+        "text": "ROI = (Fixed Assets / Current Liabilities) * 100"
+      },
+      {
+        "id": "D",
+        "text": "ROI = (Depreciation / Net Sales) * 100"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 61,
+    "question": "If an entrepreneur invests Rs 10,00,000 into a manufacturing unit and earns a net annual profit of Rs 2,50,000, what is the ROI?",
+    "options": [
+      {
+        "id": "A",
+        "text": "15%"
+      },
+      {
+        "id": "B",
+        "text": "20%"
+      },
+      {
+        "id": "C",
+        "text": "25%"
+      },
+      {
+        "id": "D",
+        "text": "40%"
+      }
+    ],
+    "correctOptionId": "C"
+  },
+  {
+    "id": 62,
+    "question": "Return on Sales (ROS) measures an enterprise's:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Total debt ratio"
+      },
+      {
+        "id": "B",
+        "text": "Operating efficiency by calculating profit generated per rupee of sales revenue"
+      },
+      {
+        "id": "C",
+        "text": "Factory physical square footage utilization"
+      },
+      {
+        "id": "D",
+        "text": "Speed of raw material transport"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 63,
+    "question": "What is the mathematical representation of Return on Sales (ROS)?",
+    "options": [
+      {
+        "id": "A",
+        "text": "(Net Operating Profit / Net Sales Revenue) * 100"
+      },
+      {
+        "id": "B",
+        "text": "(Total Liabilities / Total Equity) * 100"
+      },
+      {
+        "id": "C",
+        "text": "(Raw Material Cost / Units Sold) * 100"
+      },
+      {
+        "id": "D",
+        "text": "(Fixed Cost / Total Inventory) * 100"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 64,
+    "question": "If an enterprise records annual net sales of Rs 50,00,000 and generates an operating profit of Rs 5,00,000, the ROS is:",
+    "options": [
+      {
+        "id": "A",
+        "text": "5%"
+      },
+      {
+        "id": "B",
+        "text": "10%"
+      },
+      {
+        "id": "C",
+        "text": "15%"
+      },
+      {
+        "id": "D",
+        "text": "25%"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 65,
+    "question": "The official portal initiated by the Ministry of MSME for online registration of micro, small, and medium enterprises is:",
+    "options": [
+      {
+        "id": "A",
+        "text": "GSTN Portal"
+      },
+      {
+        "id": "B",
+        "text": "Udyam Registration Portal"
+      },
+      {
+        "id": "C",
+        "text": "MCA21 Portal"
+      },
+      {
+        "id": "D",
+        "text": "Income Tax e-Filing"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 66,
+    "question": "Which national agency provides support for technical consultation, testing, and technology transfer to MSMEs?",
+    "options": [
+      {
+        "id": "A",
+        "text": "National Small Industries Corporation (NSIC) / MSME-DFO"
+      },
+      {
+        "id": "B",
+        "text": "Insurance Regulatory and Development Authority (IRDAI)"
+      },
+      {
+        "id": "C",
+        "text": "Central Board of Film Certification (CBFC)"
+      },
+      {
+        "id": "D",
+        "text": "Telecom Regulatory Authority of India (TRAI)"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 67,
+    "question": "What is the primary role of SIDBI (Small Industries Development Bank of India)?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Formulating agricultural monsoonal forecasts"
+      },
+      {
+        "id": "B",
+        "text": "Principal financial institution for promoting, financing, and developing the MSME sector"
+      },
+      {
+        "id": "C",
+        "text": "Regulating real estate housing colonies"
+      },
+      {
+        "id": "D",
+        "text": "Conducting national civil services entrance examinations"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 68,
+    "question": "An enterprise that reduces its fixed costs while maintaining the same price and variable cost structure will experience:",
+    "options": [
+      {
+        "id": "A",
+        "text": "A higher break-even point"
+      },
+      {
+        "id": "B",
+        "text": "A lower break-even point (reaches profitability sooner)"
+      },
+      {
+        "id": "C",
+        "text": "Zero change in break-even metrics"
+      },
+      {
+        "id": "D",
+        "text": "An immediate collapse of sales volume"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 69,
+    "question": "Which agency offers dedicated support for testing and quality certification (such as ISI/BIS marks) for products?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Bureau of Indian Standards (BIS)"
+      },
+      {
+        "id": "B",
+        "text": "SEBI"
+      },
+      {
+        "id": "C",
+        "text": "Reserve Bank of India"
+      },
+      {
+        "id": "D",
+        "text": "National Highways Authority of India"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 70,
+    "question": "A major benefit enjoyed by registered MSMEs under public procurement policies in India is:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Complete exemption from all product safety standards"
+      },
+      {
+        "id": "B",
+        "text": "Mandatory minimum percentage procurement quotas by CPSEs and tender fee exemptions"
+      },
+      {
+        "id": "C",
+        "text": "Immunity from commercial contract enforcement"
+      },
+      {
+        "id": "D",
+        "text": "Automatic allotment of free commercial airline cargo space"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 71,
+    "question": "If an enterprise sells products above its Break-Even Point, the additional revenue generated over and above variable costs contributes directly to:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Fixed cost expansion"
+      },
+      {
+        "id": "B",
+        "text": "Net Operating Profit"
+      },
+      {
+        "id": "C",
+        "text": "Sunk assets"
+      },
+      {
+        "id": "D",
+        "text": "Depreciation charges"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 72,
+    "question": "The 'Margin of Safety' in break-even analysis refers to:",
+    "options": [
+      {
+        "id": "A",
+        "text": "The gap between maximum plant capacity and minimum building fire codes"
+      },
+      {
+        "id": "B",
+        "text": "The difference between actual/projected sales and break-even sales"
+      },
+      {
+        "id": "C",
+        "text": "The minimum insurance policy balance required by banks"
+      },
+      {
+        "id": "D",
+        "text": "The total quantity of reserve stock held against machine breakdowns"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 73,
+    "question": "A high ROS accompanied by a declining ROI usually points toward:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Excellent inventory turnover"
+      },
+      {
+        "id": "B",
+        "text": "Inefficient use of heavy capital assets relative to the profit margins achieved"
+      },
+      {
+        "id": "C",
+        "text": "Zero corporate tax exposure"
+      },
+      {
+        "id": "D",
+        "text": "Rapid reduction in total fixed assets"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 74,
+    "question": "Support provided by MSME Testing Centres (TCs) includes:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Auditing personal income tax returns"
+      },
+      {
+        "id": "B",
+        "text": "Providing specialized precision testing, calibration, and quality control assistance"
+      },
+      {
+        "id": "C",
+        "text": "Direct distribution of consumer goods"
+      },
+      {
+        "id": "D",
+        "text": "Regulating commercial banking interest rates"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 75,
+    "question": "When an ancillary unit faces working capital lockups due to payment delays from large buyers, it can seek relief through:",
+    "options": [
+      {
+        "id": "A",
+        "text": "The MSMED Act Micro & Small Enterprise Facilitation Council (MSEFC)"
+      },
+      {
+        "id": "B",
+        "text": "The International Maritime Court"
+      },
+      {
+        "id": "C",
+        "text": "The Geological Survey of India"
+      },
+      {
+        "id": "D",
+        "text": "The Directorate General of Foreign Trade exclusively"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 76,
+    "question": "What is the main objective of a Techno-Commercial Feasibility Study?",
+    "options": [
+      {
+        "id": "A",
+        "text": "To register trademarks in every foreign territory"
+      },
+      {
+        "id": "B",
+        "text": "To establish technical viability (engineering, processes, inputs) and commercial profitability (demand, economics, ROI)"
+      },
+      {
+        "id": "C",
+        "text": "To finalize employee uniforms and office wall colors"
+      },
+      {
+        "id": "D",
+        "text": "To eliminate all future taxation liabilities"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 77,
+    "question": "Which form of business ownership provides limited liability protection to owners while maintaining flexible partnership structures?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Sole Proprietorship"
+      },
+      {
+        "id": "B",
+        "text": "Hindu Undivided Family (HUF)"
+      },
+      {
+        "id": "C",
+        "text": "Limited Liability Partnership (LLP)"
+      },
+      {
+        "id": "D",
+        "text": "Traditional Unregistered General Partnership"
+      }
+    ],
+    "correctOptionId": "C"
+  },
+  {
+    "id": 78,
+    "question": "In a Sole Proprietorship, the owner's liability for business debts is:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Limited strictly to the initial capital invested"
+      },
+      {
+        "id": "B",
+        "text": "Unlimited, extending to personal assets and property"
+      },
+      {
+        "id": "C",
+        "text": "Zero; liability is assumed by the local municipal corporation"
+      },
+      {
+        "id": "D",
+        "text": "Capped at Rs 1,00,000 by statute"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 79,
+    "question": "What does the Unique Selling Proposition (USP) of an enterprise signify?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The standard wholesale discount given to distributors"
+      },
+      {
+        "id": "B",
+        "text": "The distinctive feature, benefit, or design that separates a product from its competitors in consumers' minds"
+      },
+      {
+        "id": "C",
+        "text": "The mandatory registration number issued by tax authorities"
+      },
+      {
+        "id": "D",
+        "text": "The highest wholesale price permitted by fair trade legislation"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 80,
+    "question": "The 4 Ps of a classic Marketing Mix framework are:",
+    "options": [
+      {
+        "id": "A",
+        "text": "People, Process, Physical Evidence, Profit"
+      },
+      {
+        "id": "B",
+        "text": "Product, Price, Place, Promotion"
+      },
+      {
+        "id": "C",
+        "text": "Planning, Purchasing, Packaging, Performance"
+      },
+      {
+        "id": "D",
+        "text": "Patent, Policy, Production, Placement"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 81,
+    "question": "An Executive Summary in a formalized Business Plan should be written:",
+    "options": [
+      {
+        "id": "A",
+        "text": "First, before conducting any market or financial research"
+      },
+      {
+        "id": "B",
+        "text": "Last, synthesizing the core highlights, business model, and projections of the plan"
+      },
+      {
+        "id": "C",
+        "text": "Solely by external government loan auditors"
+      },
+      {
+        "id": "D",
+        "text": "Without mentioning financial metrics or business objectives"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 82,
+    "question": "A Capital Budgeting decision typically involves:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Selecting the office stationary provider"
+      },
+      {
+        "id": "B",
+        "text": "Long-term investment decisions regarding heavy equipment, land, or plant modernization"
+      },
+      {
+        "id": "C",
+        "text": "Scheduling daily employee lunch shifts"
+      },
+      {
+        "id": "D",
+        "text": "Calculating minor postal dispatch fees"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 83,
+    "question": "In business negotiations, the BATNA principle stands for:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Best Alternative To a Negotiated Agreement"
+      },
+      {
+        "id": "B",
+        "text": "Business Assessment Towards National Assets"
+      },
+      {
+        "id": "C",
+        "text": "Budget Allocation Techniques for New Assets"
+      },
+      {
+        "id": "D",
+        "text": "Basic Approach to Negotiation Agendas"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 84,
+    "question": "Which negotiation technique involves splitting contentious package deals into smaller concessions to find common ground?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Extreme Stonewalling"
+      },
+      {
+        "id": "B",
+        "text": "Fractional / Logrolling bargaining"
+      },
+      {
+        "id": "C",
+        "text": "Take-it-or-leave-it hardball tactics"
+      },
+      {
+        "id": "D",
+        "text": "Complete submission"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 85,
+    "question": "How do Angel Investors differ from Venture Capital (VC) firms?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Angel investors use institutional public pension funds; VCs use personal petty cash"
+      },
+      {
+        "id": "B",
+        "text": "Angel investors are typically high-net-worth individuals investing personal funds at early stages; VCs manage pooled institutional funds"
+      },
+      {
+        "id": "C",
+        "text": "Angel investors never acquire company equity"
+      },
+      {
+        "id": "D",
+        "text": "Venture Capitalists only invest after a company completes its IPO"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 86,
+    "question": "What is the fundamental difference between an Incubation Center and an Accelerator?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Incubators only serve publicly listed MNCs; Accelerators work with university dropouts"
+      },
+      {
+        "id": "B",
+        "text": "Incubators nurture early-stage ideas over longer horizons (1-3 years); Accelerators offer fast-tracked, cohort-based scaling programs (3-6 months)"
+      },
+      {
+        "id": "C",
+        "text": "Incubators strictly offer debt financing; Accelerators provide real estate leases only"
+      },
+      {
+        "id": "D",
+        "text": "Incubators charge interest; Accelerators are charitable foundations"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 87,
+    "question": "Atal Incubation Centres (AICs) have been established across India under the aegis of which initiative?",
+    "options": [
+      {
+        "id": "A",
+        "text": "NITI Aayog's Atal Innovation Mission (AIM)"
+      },
+      {
+        "id": "B",
+        "text": "Reserve Bank of India Financial Literacy Mission"
+      },
+      {
+        "id": "C",
+        "text": "Ministry of Civil Aviation"
+      },
+      {
+        "id": "D",
+        "text": "National Green Tribunal"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 88,
+    "question": "A working capital budget estimates:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Multi-decade factory construction schedules"
+      },
+      {
+        "id": "B",
+        "text": "Short-term cash inflows and outflows required to fund day-to-day operations"
+      },
+      {
+        "id": "C",
+        "text": "Statutory life spans of proprietary patents"
+      },
+      {
+        "id": "D",
+        "text": "Equity stock options granted upon terminal buyout"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 89,
+    "question": "In risk management, the strategy of purchasing insurance against catastrophic fire or plant equipment breakdown is termed:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Risk avoidance"
+      },
+      {
+        "id": "B",
+        "text": "Risk retention / absorption"
+      },
+      {
+        "id": "C",
+        "text": "Risk transference"
+      },
+      {
+        "id": "D",
+        "text": "Risk magnification"
+      }
+    ],
+    "correctOptionId": "C"
+  },
+  {
+    "id": 90,
+    "question": "The concept of 'Bootstrapping' a startup means:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Securing Rs 100 Crores in venture debt on day one"
+      },
+      {
+        "id": "B",
+        "text": "Financing business launch and operations entirely through personal savings and lean, reinvested internal revenues"
+      },
+      {
+        "id": "C",
+        "text": "Selling equity to foreign sovereign wealth funds"
+      },
+      {
+        "id": "D",
+        "text": "Taking unmanageable high-interest predatory private loans"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 91,
+    "question": "What is the 'Burn Rate' of a venture?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The physical fuel consumption rate of factory generator turbines"
+      },
+      {
+        "id": "B",
+        "text": "The rate at which an early-stage company spends its cash reserves to cover operational losses before achieving positive cash flows"
+      },
+      {
+        "id": "C",
+        "text": "The rate of scrap raw material lost during metal fabrication"
+      },
+      {
+        "id": "D",
+        "text": "The legal depreciation speed of office equipment"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 92,
+    "question": "A 'Pivot' by a startup refers to:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Liquidating the business entirely and filing for corporate insolvency"
+      },
+      {
+        "id": "B",
+        "text": "Making a structured course correction to the business model or product based on customer feedback and validated metrics"
+      },
+      {
+        "id": "C",
+        "text": "Firing the entire original technical engineering crew"
+      },
+      {
+        "id": "D",
+        "text": "Relocating office equipment within the same physical room"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 93,
+    "question": "A competitive advantage based on 'Cost Leadership' focuses on:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Selling at the absolute highest market price via ultra-luxury prestige branding"
+      },
+      {
+        "id": "B",
+        "text": "Achieving the lowest operational and manufacturing costs in the industry to offer competitive pricing"
+      },
+      {
+        "id": "C",
+        "text": "Outspending all competitors on cinematic television advertisements"
+      },
+      {
+        "id": "D",
+        "text": "Offering bespoke customized items with long assembly lead times"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 94,
+    "question": "What is a 'Term Sheet' presented by a venture capitalist?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A court summons for business debt defaults"
+      },
+      {
+        "id": "B",
+        "text": "A non-binding preliminary agreement outlining the core terms, valuation, and conditions of a proposed investment"
+      },
+      {
+        "id": "C",
+        "text": "An electricity utility bill for commercial premises"
+      },
+      {
+        "id": "D",
+        "text": "An employee handbook detailing working shift hours"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 95,
+    "question": "Which of the following is considered an equity financing route?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Commercial bank term loans"
+      },
+      {
+        "id": "B",
+        "text": "Collateralized equipment leasing"
+      },
+      {
+        "id": "C",
+        "text": "Issuing common shares to Angel Investors in exchange for capital"
+      },
+      {
+        "id": "D",
+        "text": "Bank overdraft cash-credit limits"
+      }
+    ],
+    "correctOptionId": "C"
+  },
+  {
+    "id": 96,
+    "question": "A market penetration pricing strategy involves:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Setting an initially low price to attract large volumes, build market share, and discourage rivals"
+      },
+      {
+        "id": "B",
+        "text": "Setting the highest possible skimming price to recover R&D costs from early innovators"
+      },
+      {
+        "id": "C",
+        "text": "Pricing completely at random without monitoring unit manufacturing costs"
+      },
+      {
+        "id": "D",
+        "text": "Matching competitor prices without tracking internal margins"
+      }
+    ],
+    "correctOptionId": "A"
+  },
+  {
+    "id": 97,
+    "question": "In a Private Limited Company, what restriction is placed on ownership share transfers?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Shares can be openly traded on public stock exchanges by any retail customer"
+      },
+      {
+        "id": "B",
+        "text": "Share transfers are restricted per company Articles of Association (AoA) and cannot be publicly traded"
+      },
+      {
+        "id": "C",
+        "text": "No shares can ever be issued to founders"
+      },
+      {
+        "id": "D",
+        "text": "Ownership is automatically transferred to municipal trusts after three years"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 98,
+    "question": "What is the role of an Angel Network/Syndicate?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Regulating national foreign policy"
+      },
+      {
+        "id": "B",
+        "text": "Pooling capital, due diligence expertise, and networks from multiple private investors to back startups"
+      },
+      {
+        "id": "C",
+        "text": "Printing currency notes for micro-credit cooperatives"
+      },
+      {
+        "id": "D",
+        "text": "Enforcing municipal shop license closures"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 99,
+    "question": "What does the 'Runway' of a startup describe?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The length of dedicated freight loading docks in an industrial warehouse"
+      },
+      {
+        "id": "B",
+        "text": "The number of months a startup can continue operating at its current burn rate before exhausting its cash reserves"
+      },
+      {
+        "id": "C",
+        "text": "The highway distance to the nearest regional cargo airport"
+      },
+      {
+        "id": "D",
+        "text": "The total number of registered retail storefronts nationwide"
+      }
+    ],
+    "correctOptionId": "B"
+  },
+  {
+    "id": 100,
+    "question": "In business planning, sensitivity analysis evaluates:",
+    "options": [
+      {
+        "id": "A",
+        "text": "How variations in key assumptions (e.g., sales volume, material costs) affect financial viability and profitability"
+      },
+      {
+        "id": "B",
+        "text": "The emotional well-being of the executive founding members"
+      },
+      {
+        "id": "C",
+        "text": "The ambient temperature sensitivity of factory HVAC units"
+      },
+      {
+        "id": "D",
+        "text": "How competitors react to social media ad campaigns"
+      }
+    ],
+    "correctOptionId": "A"
+  }
+]
