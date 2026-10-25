@@ -4,9 +4,20 @@
 
 export type OptionId = 'A' | 'B' | 'C' | 'D';
 
+/**
+ * Raw option representation from source dataset.
+ * `id` is the permanent immutable source identifier.
+ */
 export interface Option {
   id: OptionId;
   text: string;
+}
+
+/**
+ * Option with assigned visual display label ('A', 'B', 'C', 'D' from top to bottom).
+ */
+export interface DisplayOption extends Option {
+  displayLabel: OptionId;
 }
 
 export interface Question {
@@ -20,9 +31,11 @@ export interface Question {
 export interface UserAnswer {
   questionId: number;
   selectedOptionId: OptionId;
+  selectedDisplayLabel: OptionId;
   correctOptionId: OptionId;
+  correctDisplayLabel: OptionId;
   isCorrect: boolean;
-  shuffledOptions: Option[];
+  shuffledOptions: DisplayOption[];
   timestamp: number;
 }
 
@@ -49,7 +62,7 @@ export interface QuizState {
   viewMode: QuizViewMode;
   questions: Question[];
   currentIndex: number;
-  currentShuffledOptions: Option[];
+  currentShuffledOptions: DisplayOption[];
   userAnswers: Record<number, UserAnswer>;
   isAnswerSubmitted: boolean;
   reviewFilter: ReviewFilter;
@@ -61,7 +74,7 @@ export interface QuizEngine {
   questions: Question[];
   currentIndex: number;
   currentQuestion: Question | null;
-  currentShuffledOptions: Option[];
+  currentShuffledOptions: DisplayOption[];
   userAnswers: Record<number, UserAnswer>;
   isAnswerSubmitted: boolean;
   currentAnswer: UserAnswer | null;

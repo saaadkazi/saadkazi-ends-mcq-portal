@@ -1,4 +1,69 @@
-/* CSS Custom Properties & Design Tokens will be defined in subsequent phase */
+/* Design Tokens: ENDS-MCQ-PORTAL */
+
 :root {
-  color-scheme: light dark;
+  /* Surface & Backgrounds */
+  --bg-app: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-surface-subtle: #F1F5F9;
+  --bg-surface-hover: #F8FAFC;
+
+  /* Primary Accent: Dark Navy Blue */
+  --color-primary: #0F172A;
+  --color-primary-hover: #1E293B;
+  --color-primary-active: #020617;
+  --color-primary-text: #FFFFFF;
+
+  /* Secondary & Light Blue Subtle Accents */
+  --color-accent-subtle: #F0F9FF;
+  --color-accent-light: #E0F2FE;
+  --color-accent-border: #BAE6FD;
+  --color-accent-primary: #0284C7;
+  --color-accent-text: #0369A1;
+
+  /* Validation & Feedback: Correct / Success */
+  --color-success-bg: #ECFDF5;
+  --color-success-border: #10B981;
+  --color-success-text: #065F46;
+  --color-success-solid: #059669;
+
+  /* Validation & Feedback: Incorrect / Danger */
+  --color-danger-bg: #FEF2F2;
+  --color-danger-border: #EF4444;
+  --color-danger-text: #991B1B;
+  --color-danger-solid: #DC2626;
+
+  /* Warning / Review Tier */
+  --color-warning-bg: #FFFBEB;
+  --color-warning-border: #F59E0B;
+  --color-warning-text: #92400E;
+
+  /* Neutrals & Typography */
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --text-inverse: #FFFFFF;
+
+  /* Borders */
+  --border-subtle: #E2E8F0;
+  --border-strong: #CBD5E1;
+  --border-focus: #0284C7;
+
+  /* Restrained Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+
+  /* Border Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }

@@ -1,6 +1,9 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import XLSX from 'xlsx';
+import * as XLSXModule from 'xlsx';
+
+// Universal ESM/CJS interop for SheetJS (xlsx)
+const XLSX = (XLSXModule as { default?: typeof XLSXModule }).default || XLSXModule;
 
 export type OptionId = 'A' | 'B' | 'C' | 'D';
 

@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import rawQuestions from '../data/questions.json';
 import type {
+  DisplayOption,
   Option,
   OptionId,
   Question,
@@ -13,12 +14,25 @@ import { calculateQuizStats } from '../utils/scoring';
 import { shuffleArray } from '../utils/shuffle';
 
 const DEFAULT_QUESTIONS: readonly Question[] = rawQuestions as Question[];
+const DISPLAY_LABELS: readonly OptionId[] = ['A', 'B', 'C', 'D'];
+
+/**
+ * Shuffles options for a question and assigns sequential display labels 'A', 'B', 'C', 'D'.
+ * Preserves each option's permanent source ID and text.
+ */
+export function createDisplayOptions(options: readonly Option[]): DisplayOption[] {
+  const shuffled = shuffleArray(options);
+  return shuffled.map((opt, index) => ({
+    ...opt,
+    displayLabel: DISPLAY_LABELS[index] ?? 'A'
+  }));
+}
 
 /**
  * Quiz State Machine Hook
  *
  * Implements strict quiz progression, answer locking, independent option shuffling,
- * accurate scoring, and review filtering.
+ * sequential visual display labels (A-D), accurate scoring, and review filtering.
  */
 export function useQuizEngine(
   initialQuestions: readonly Question[] = DEFAULT_QUESTIONS
@@ -26,7 +40,7 @@ export function useQuizEngine(
   const [viewMode, setViewMode] = useState<QuizViewMode>('welcome');
   const [questions, setQuestions] = useState<Question[]>(() => [...initialQuestions]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [currentShuffledOptions, setCurrentShuffledOptions] = useState<Option[]>([]);
+  const [currentShuffledOptions, setCurrentShuffledOptions] = useState<DisplayOption[]>([]);
   const [userAnswers, setUserAnswers] = useState<Record<number, UserAnswer>>({});
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState<boolean>(false);
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all');
@@ -54,7 +68,7 @@ export function useQuizEngine(
     setViewMode('quiz');
 
     if (randomized.length > 0) {
-      setCurrentShuffledOptions(shuffleArray(randomized[0].options));
+      setCurrentShuffledOptions(createDisplayOptions(randomized[0].options));
     } else {
       setCurrentShuffledOptions([]);
     }
@@ -67,6 +81,7 @@ export function useQuizEngine(
    * 1. Single-submission answer locking: Cannot submit if already submitted.
    * 2. Cannot change answer after submission.
    * 3. Evaluates correctness strictly via permanent OptionId.
+   * 4. Maps and preserves both permanent IDs and visual display labels.
    */
   const submitAnswer = useCallback(
     (selectedOptionId: OptionId): boolean => {
@@ -81,10 +96,20 @@ export function useQuizEngine(
 
       const isCorrect = selectedOptionId === currentQuestion.correctOptionId;
 
+      // Identify the displayed label for user's selection
+      const selectedDisplayOpt = currentShuffledOptions.find((o) => o.id === selectedOptionId);
+      const selectedDisplayLabel = selectedDisplayOpt?.displayLabel ?? selectedOptionId;
+
+      // Identify the displayed label for the correct answer
+      const correctDisplayOpt = currentShuffledOptions.find((o) => o.id === currentQuestion.correctOptionId);
+      const correctDisplayLabel = correctDisplayOpt?.displayLabel ?? currentQuestion.correctOptionId;
+
       const newAnswer: UserAnswer = {
         questionId: currentQuestion.id,
         selectedOptionId,
+        selectedDisplayLabel,
         correctOptionId: currentQuestion.correctOptionId,
+        correctDisplayLabel,
         isCorrect,
         shuffledOptions: [...currentShuffledOptions],
         timestamp: Date.now()
@@ -135,8 +160,8 @@ export function useQuizEngine(
       setCurrentShuffledOptions(existingAnswer.shuffledOptions);
       setIsAnswerSubmitted(true);
     } else {
-      // Shuffle options freshly for the new question
-      setCurrentShuffledOptions(shuffleArray(nextQ.options));
+      // Shuffle options freshly for the new question and bind sequential display labels
+      setCurrentShuffledOptions(createDisplayOptions(nextQ.options));
       setIsAnswerSubmitted(false);
     }
 
