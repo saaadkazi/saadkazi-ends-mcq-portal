@@ -38,10 +38,11 @@ export const OptionItem: React.FC<OptionItemProps> = ({
   return (
     <button
       type="button"
+      role="radio"
       className={itemClasses}
       onClick={onSelect}
       disabled={disabled}
-      aria-pressed={isSelected}
+      aria-checked={isSelected}
       aria-label={`Option ${option.displayLabel}: ${option.text}`}
     >
       <span className="option-indicator" aria-hidden="true">

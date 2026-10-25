@@ -6,14 +6,34 @@ import { Badge } from '../components/common/Badge';
 export interface WelcomeViewProps {
   totalQuestions: number;
   onStartQuiz: () => void;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
 }
 
-export const WelcomeView: React.FC<WelcomeViewProps> = ({ totalQuestions, onStartQuiz }) => {
+export const WelcomeView: React.FC<WelcomeViewProps> = ({
+  totalQuestions,
+  onStartQuiz,
+  isMuted = false,
+  onToggleMute
+}) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: 'auto 0' }}>
       <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
           <Badge variant="blue">Official Exam Preparation Portal</Badge>
+          {onToggleMute && (
+            <button
+              type="button"
+              onClick={onToggleMute}
+              className="btn btn-ghost header-action-btn"
+              style={{ fontSize: '0.8rem', padding: '0.35rem 0.65rem' }}
+              aria-label={isMuted ? 'Unmute answer sound effects' : 'Mute answer sound effects'}
+              title={isMuted ? 'Unmute sound effects' : 'Mute sound effects'}
+            >
+              <span aria-hidden="true">{isMuted ? '🔇' : '🔊'}</span>
+              <span>{isMuted ? 'Sound Muted' : 'Sound On'}</span>
+            </button>
+          )}
         </div>
         <h1 style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--color-primary)', marginBottom: '0.5rem' }}>
           Entrepreneurship Development

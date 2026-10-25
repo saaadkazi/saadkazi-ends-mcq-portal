@@ -18,6 +18,20 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Accessible Keyboard Focus Indicators */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.btn:focus-visible,
+.option-item:focus-visible,
+.filter-btn:focus-visible,
+.header-action-btn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
 body {
   min-height: 100vh;
   background-color: var(--bg-app);
@@ -374,4 +388,32 @@ p {
   background-color: var(--color-primary);
   color: var(--color-primary-text);
   box-shadow: var(--shadow-sm);
+}
+
+/* Quiz Header Responsive Layout & Mobile Touch Targets (>= 44px) */
+.quiz-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.quiz-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.header-action-btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.45rem 0.75rem !important;
+  font-size: 0.85rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
 }

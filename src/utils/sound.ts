@@ -56,6 +56,7 @@ export function playAudioSafely(
 
   try {
     const audio = new Audio(src);
+    audio.loop = false;
     audio.volume = Math.max(0, Math.min(1, volume));
     const promise = audio.play();
     if (promise && typeof promise.catch === 'function') {
@@ -66,5 +67,20 @@ export function playAudioSafely(
     return audio;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Safely stops and resets an audio element.
+ */
+export function stopAudioSafely(audio: HTMLAudioElement | null): void {
+  if (!audio) {
+    return;
+  }
+  try {
+    audio.pause();
+    audio.currentTime = 0;
+  } catch {
+    // Safe ignore for browser playback interruption errors
   }
 }

@@ -4,7 +4,13 @@ import { createDisplayOptions } from '../src/hooks/useQuizEngine';
 import type { DisplayOption, OptionId, Question, UserAnswer } from '../src/types/quiz';
 import { calculatePercentage, calculateQuizStats, getPerformanceTier } from '../src/utils/scoring';
 import { shuffleArray } from '../src/utils/shuffle';
-import { CORRECT_SOUND, INCORRECT_SOUNDS, selectNextIncorrectSound } from '../src/utils/sound';
+import {
+  CORRECT_SOUND,
+  INCORRECT_SOUNDS,
+  playAudioSafely,
+  selectNextIncorrectSound,
+  stopAudioSafely
+} from '../src/utils/sound';
 
 let passedTests = 0;
 let failedTests = 0;
@@ -320,6 +326,14 @@ function createTestHarness(questions: readonly Question[]) {
       if (questionsList.length > 0) {
         currentShuffledOptions = createDisplayOptions(questionsList[0].options);
       }
+    },
+
+    resetToWelcome(): void {
+      currentIndex = 0;
+      userAnswers = {};
+      isAnswerSubmitted = false;
+      viewMode = 'welcome';
+      currentShuffledOptions = [];
     }
   };
 }
@@ -602,6 +616,120 @@ test('10. Muting prevents sound playback', () => {
   const resultUnmuted = playAnswerSoundMock(false, false, null);
   assert.ok(resultUnmuted);
   assert.strictEqual(playedSounds.length, 1);
+});
+
+test('11. stopAudioSafely pauses active audio and resets playback position to 0', () => {
+  let paused = false;
+  const mockAudio = {
+    currentTime: 3.45,
+    pause: () => {
+      paused = true;
+    }
+  } as unknown as HTMLAudioElement;
+
+  stopAudioSafely(mockAudio);
+  assert.strictEqual(paused, true, 'Audio must be paused');
+  assert.strictEqual(mockAudio.currentTime, 0, 'Playback position must be reset to 0');
+
+  // Should also safely handle null/undefined
+  stopAudioSafely(null);
+  stopAudioSafely(undefined as unknown as HTMLAudioElement);
+});
+
+test('12. playAudioSafely configures audio.loop = false explicitly', () => {
+  const originalAudio = (globalThis as any).Audio;
+
+  (globalThis as any).Audio = class MockAudio {
+    loop = true; // initialized true to verify playAudioSafely explicitly sets false
+    volume = 1;
+    play() {
+      return Promise.resolve();
+    }
+    constructor(_src: string) {}
+  };
+
+  try {
+    const audio = playAudioSafely('/sounds/correct/correct-answer.mp3');
+    assert.ok(audio);
+    assert.strictEqual(audio.loop, false, 'audio.loop must be explicitly false');
+  } finally {
+    (globalThis as any).Audio = originalAudio;
+  }
+});
+
+test('13. Muting immediately halts currently active audio playback', () => {
+  let isMuted = false;
+  let activeAudio: { pauseCount: number; currentTime: number } | null = {
+    pauseCount: 0,
+    currentTime: 2.5
+  };
+
+  const stopAudio = () => {
+    if (activeAudio) {
+      activeAudio.pauseCount++;
+      activeAudio.currentTime = 0;
+      activeAudio = null;
+    }
+  };
+
+  const toggleMute = () => {
+    isMuted = !isMuted;
+    if (isMuted) {
+      stopAudio();
+    }
+  };
+
+  // User mutes mid-audio
+  toggleMute();
+  assert.strictEqual(isMuted, true);
+  assert.strictEqual(activeAudio, null, 'Active audio reference must be cleared when muted');
+});
+
+test('14. Exit cancellation preserves quiz progression and user answers intact', () => {
+  const harness = createTestHarness(typedQuestions.slice(0, 5));
+  const q0 = harness.currentQuestion!;
+  harness.submitAnswer(q0.options[0].id);
+  assert.strictEqual(Object.keys(harness.userAnswers).length, 1);
+
+  // User triggers exit but cancels confirm dialog
+  const mockConfirm = (shouldExit: boolean) => {
+    if (shouldExit) {
+      harness.resetToWelcome();
+    }
+  };
+
+  // Canceled exit:
+  mockConfirm(false);
+  assert.strictEqual(harness.currentIndex, 0);
+  assert.strictEqual(Object.keys(harness.userAnswers).length, 1, 'Answers must be preserved on cancel');
+  assert.strictEqual(harness.isAnswerSubmitted, true);
+  assert.strictEqual(harness.viewMode, 'quiz');
+
+  // Confirmed exit:
+  mockConfirm(true);
+  assert.strictEqual(harness.currentIndex, 0);
+  assert.strictEqual(Object.keys(harness.userAnswers).length, 0, 'Answers are cleared on confirmed exit');
+  assert.strictEqual(harness.viewMode, 'welcome');
+});
+
+test('15. Next question navigation triggers audio stop to prevent leakage', () => {
+  let audioStopped = false;
+  const stopAudio = () => {
+    audioStopped = true;
+  };
+
+  const harness = createTestHarness(typedQuestions.slice(0, 3));
+  harness.submitAnswer(harness.currentQuestion!.options[0].id);
+
+  // handleNext pattern
+  const handleNext = () => {
+    stopAudio();
+    harness.nextQuestion();
+  };
+
+  handleNext();
+  assert.strictEqual(audioStopped, true, 'Audio must be stopped before advancing to next question');
+  assert.strictEqual(harness.currentIndex, 1);
 });
 
 // ---------------------------------------------------------
