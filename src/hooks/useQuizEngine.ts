@@ -41,6 +41,7 @@ export function useQuizEngine(
   const [questions, setQuestions] = useState<Question[]>(() => [...initialQuestions]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [currentShuffledOptions, setCurrentShuffledOptions] = useState<DisplayOption[]>([]);
+  const [shuffledOptionsMap, setShuffledOptionsMap] = useState<Record<number, DisplayOption[]>>({});
   const [userAnswers, setUserAnswers] = useState<Record<number, UserAnswer>>({});
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState<boolean>(false);
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all');
@@ -67,8 +68,14 @@ export function useQuizEngine(
     setIsAnswerSubmitted(false);
     setViewMode('quiz');
 
+    const optionsMap: Record<number, DisplayOption[]> = {};
+    randomized.forEach((q) => {
+      optionsMap[q.id] = createDisplayOptions(q.options);
+    });
+    setShuffledOptionsMap(optionsMap);
+
     if (randomized.length > 0) {
-      setCurrentShuffledOptions(createDisplayOptions(randomized[0].options));
+      setCurrentShuffledOptions(optionsMap[randomized[0].id] ?? []);
     } else {
       setCurrentShuffledOptions([]);
     }
@@ -160,13 +167,47 @@ export function useQuizEngine(
       setCurrentShuffledOptions(existingAnswer.shuffledOptions);
       setIsAnswerSubmitted(true);
     } else {
-      // Shuffle options freshly for the new question and bind sequential display labels
-      setCurrentShuffledOptions(createDisplayOptions(nextQ.options));
+      // Use the stable shuffled options for this question and bind sequential display labels
+      const options = shuffledOptionsMap[nextQ.id] ?? createDisplayOptions(nextQ.options);
+      setCurrentShuffledOptions(options);
       setIsAnswerSubmitted(false);
     }
 
     return true;
-  }, [currentQuestion, isAnswerSubmitted, currentIndex, questions, userAnswers]);
+  }, [currentQuestion, isAnswerSubmitted, currentIndex, questions, userAnswers, shuffledOptionsMap]);
+
+  /**
+   * Navigates to the previous question.
+   *
+   * CRITICAL RULES ENFORCED:
+   * 1. Cannot navigate backward if on or before the first question (currentIndex <= 0).
+   * 2. Cannot navigate backward if quiz is not in 'quiz' mode.
+   * 3. Restores previously answered question state (options, locked submitted answer).
+   * 4. Preserves option shuffling, scoring, and does not replay sounds.
+   */
+  const previousQuestion = useCallback((): boolean => {
+    if (viewMode !== 'quiz' || currentIndex <= 0) {
+      return false;
+    }
+
+    const prevIndex = currentIndex - 1;
+    setCurrentIndex(prevIndex);
+
+    const prevQ = questions[prevIndex];
+    const existingAnswer = userAnswers[prevQ.id];
+
+    if (existingAnswer) {
+      // Restore previously seen shuffled options and lock state
+      setCurrentShuffledOptions(existingAnswer.shuffledOptions);
+      setIsAnswerSubmitted(true);
+    } else {
+      const options = shuffledOptionsMap[prevQ.id] ?? createDisplayOptions(prevQ.options);
+      setCurrentShuffledOptions(options);
+      setIsAnswerSubmitted(false);
+    }
+
+    return true;
+  }, [viewMode, currentIndex, questions, userAnswers, shuffledOptionsMap]);
 
   /**
    * Finishes the quiz and transitions to results.
@@ -199,6 +240,7 @@ export function useQuizEngine(
     setUserAnswers({});
     setIsAnswerSubmitted(false);
     setCurrentShuffledOptions([]);
+    setShuffledOptionsMap({});
   }, []);
 
   // Compute analytics
@@ -230,6 +272,7 @@ export function useQuizEngine(
     startQuiz,
     submitAnswer,
     nextQuestion,
+    previousQuestion,
     finishQuiz,
     restartQuiz,
     startReview,

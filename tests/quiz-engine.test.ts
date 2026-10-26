@@ -252,8 +252,12 @@ console.log('\n--- 5. Testing Quiz State Machine Logic ---');
 function createTestHarness(questions: readonly Question[]) {
   let questionsList = shuffleArray(questions);
   let currentIndex = 0;
+  const optionsMap: Record<number, DisplayOption[]> = {};
+  questionsList.forEach((q) => {
+    optionsMap[q.id] = createDisplayOptions(q.options);
+  });
   let currentShuffledOptions: DisplayOption[] =
-    questionsList.length > 0 ? createDisplayOptions(questionsList[0].options) : [];
+    questionsList.length > 0 ? (optionsMap[questionsList[0].id] ?? []) : [];
   let userAnswers: Record<number, UserAnswer> = {};
   let isAnswerSubmitted = false;
   let viewMode = 'quiz';
@@ -266,6 +270,8 @@ function createTestHarness(questions: readonly Question[]) {
     get userAnswers() { return userAnswers; },
     get isAnswerSubmitted() { return isAnswerSubmitted; },
     get questionsList() { return questionsList; },
+    get isFirstQuestion() { return currentIndex === 0; },
+    get isLastQuestion() { return currentIndex === questionsList.length - 1; },
 
     submitAnswer(optionId: OptionId): boolean {
       const q = questionsList[currentIndex];
@@ -311,7 +317,25 @@ function createTestHarness(questions: readonly Question[]) {
         currentShuffledOptions = existing.shuffledOptions;
         isAnswerSubmitted = true;
       } else {
-        currentShuffledOptions = createDisplayOptions(nextQ.options);
+        currentShuffledOptions = optionsMap[nextQ.id] ?? createDisplayOptions(nextQ.options);
+        isAnswerSubmitted = false;
+      }
+      return true;
+    },
+
+    previousQuestion(): boolean {
+      if (viewMode !== 'quiz' || currentIndex <= 0) {
+        return false;
+      }
+      const prevIdx = currentIndex - 1;
+      currentIndex = prevIdx;
+      const prevQ = questionsList[prevIdx];
+      const existing = userAnswers[prevQ.id];
+      if (existing) {
+        currentShuffledOptions = existing.shuffledOptions;
+        isAnswerSubmitted = true;
+      } else {
+        currentShuffledOptions = optionsMap[prevQ.id] ?? createDisplayOptions(prevQ.options);
         isAnswerSubmitted = false;
       }
       return true;
@@ -323,8 +347,11 @@ function createTestHarness(questions: readonly Question[]) {
       userAnswers = {};
       isAnswerSubmitted = false;
       viewMode = 'quiz';
+      for (const q of questionsList) {
+        optionsMap[q.id] = createDisplayOptions(q.options);
+      }
       if (questionsList.length > 0) {
-        currentShuffledOptions = createDisplayOptions(questionsList[0].options);
+        currentShuffledOptions = optionsMap[questionsList[0].id] ?? [];
       }
     },
 
@@ -438,6 +465,144 @@ test('Original Question Bank Immutability: Source dataset is never mutated', () 
   assert.deepStrictEqual(typedQuestions.map((q) => q.id), originalIds);
   assert.strictEqual(JSON.stringify(typedQuestions[0]), originalFirstQ);
 });
+
+// ---------------------------------------------------------
+// 5B. PREVIOUS QUESTION NAVIGATION TESTS
+// ---------------------------------------------------------
+console.log('\n--- 5B. Testing Previous Question Navigation Logic ---');
+
+test('Previous Question Guard: Blocked on first question (currentIndex === 0)', () => {
+  const harness = createTestHarness(typedQuestions.slice(0, 5));
+  assert.strictEqual(harness.currentIndex, 0);
+  assert.strictEqual(harness.isFirstQuestion, true);
+
+  // Attempting previousQuestion on first question must return false
+  const prevAttempt = harness.previousQuestion();
+  assert.strictEqual(prevAttempt, false);
+  assert.strictEqual(harness.currentIndex, 0, 'Index must remain at 0');
+});
+
+test('Previous Navigation: Moves backward and restores previous question, options, and submission state', () => {
+  const harness = createTestHarness(typedQuestions.slice(0, 5));
+  const q0 = harness.currentQuestion!;
+  const q0Shuffled = [...harness.currentShuffledOptions];
+
+  // Submit Q0 and advance to Q1
+  harness.submitAnswer(q0.correctOptionId);
+  assert.strictEqual(harness.isAnswerSubmitted, true);
+  harness.nextQuestion();
+
+  assert.strictEqual(harness.currentIndex, 1);
+  assert.strictEqual(harness.isFirstQuestion, false);
+  assert.strictEqual(harness.isAnswerSubmitted, false);
+
+  // Navigate backward to Q0
+  const canGoBack = harness.previousQuestion();
+  assert.strictEqual(canGoBack, true);
+  assert.strictEqual(harness.currentIndex, 0);
+  assert.strictEqual(harness.isFirstQuestion, true);
+  assert.strictEqual(harness.currentQuestion!.id, q0.id);
+  assert.strictEqual(harness.isAnswerSubmitted, true);
+  assert.deepStrictEqual(harness.currentShuffledOptions, q0Shuffled);
+});
+
+test('Answer Locking on Previous: Previously submitted answers remain locked; cannot resubmit or change', () => {
+  const harness = createTestHarness(typedQuestions.slice(0, 5));
+  const q0 = harness.currentQuestion!;
+
+  // Answer Q0 correctly
+  harness.submitAnswer(q0.correctOptionId);
+  harness.nextQuestion();
+
+  // Navigate back to Q0
+  harness.previousQuestion();
+  assert.strictEqual(harness.currentIndex, 0);
+  assert.strictEqual(harness.isAnswerSubmitted, true);
+
+  // Attempt to resubmit or change to a different option
+  const otherOption: OptionId = q0.correctOptionId === 'A' ? 'B' : 'A';
+  const resubmitResult = harness.submitAnswer(otherOption);
+  assert.strictEqual(resubmitResult, false, 'Resubmission must be strictly rejected');
+  assert.strictEqual(harness.userAnswers[q0.id].selectedOptionId, q0.correctOptionId, 'Original selection must remain untouched');
+});
+
+test('Option Shuffling Stability: Options and display labels remain invariant across backward and forward navigation', () => {
+  const harness = createTestHarness(typedQuestions.slice(0, 5));
+  const q0 = harness.currentQuestion!;
+  const q0OptionsInitial = harness.currentShuffledOptions.map((o) => ({ id: o.id, label: o.displayLabel }));
+
+  harness.submitAnswer(q0.correctOptionId);
+  harness.nextQuestion();
+
+  assert.ok(harness.currentQuestion);
+  const q1OptionsInitial = harness.currentShuffledOptions.map((o) => ({ id: o.id, label: o.displayLabel }));
+
+  // Navigate back and forth 5 times
+  for (let cycle = 0; cycle < 5; cycle++) {
+    harness.previousQuestion();
+    const q0OptionsCheck = harness.currentShuffledOptions.map((o) => ({ id: o.id, label: o.displayLabel }));
+    assert.deepStrictEqual(q0OptionsCheck, q0OptionsInitial, `Cycle ${cycle}: Q0 options must not re-shuffle`);
+
+    harness.nextQuestion();
+    const q1OptionsCheck = harness.currentShuffledOptions.map((o) => ({ id: o.id, label: o.displayLabel }));
+    assert.deepStrictEqual(q1OptionsCheck, q1OptionsInitial, `Cycle ${cycle}: Q1 options must not re-shuffle`);
+  }
+});
+
+test('Score & Answer Integrity: Backward navigation does not alter score, answered count, or duplicate answers', () => {
+  const harness = createTestHarness(typedQuestions.slice(0, 5));
+  const q0 = harness.currentQuestion!;
+  harness.submitAnswer(q0.correctOptionId);
+  harness.nextQuestion();
+
+  const q1 = harness.currentQuestion!;
+  const wrongOption: OptionId = q1.correctOptionId === 'A' ? 'B' : 'A';
+  harness.submitAnswer(wrongOption);
+  harness.nextQuestion();
+
+  // At Q2: 2 questions answered (1 correct, 1 incorrect)
+  const initialStats = calculateQuizStats(harness.userAnswers, 5);
+  assert.strictEqual(initialStats.answeredCount, 2);
+  assert.strictEqual(initialStats.correctCount, 1);
+  assert.strictEqual(initialStats.incorrectCount, 1);
+
+  // Navigate backward to Q1, then Q0, then forward back to Q2
+  harness.previousQuestion(); // At Q1
+  assert.strictEqual(harness.currentIndex, 1);
+  harness.previousQuestion(); // At Q0
+  assert.strictEqual(harness.currentIndex, 0);
+  harness.nextQuestion();     // At Q1
+  assert.strictEqual(harness.currentIndex, 1);
+  harness.nextQuestion();     // At Q2
+  assert.strictEqual(harness.currentIndex, 2);
+
+  const statsAfterNav = calculateQuizStats(harness.userAnswers, 5);
+  assert.strictEqual(statsAfterNav.answeredCount, 2, 'Answered count must not change');
+  assert.strictEqual(statsAfterNav.correctCount, 1, 'Correct count must not change');
+  assert.strictEqual(statsAfterNav.incorrectCount, 1, 'Incorrect count must not change');
+  assert.strictEqual(Object.keys(harness.userAnswers).length, 2, 'User answers must not duplicate');
+});
+
+test('Progression Guard on Unanswered Question after Backward Navigation', () => {
+  const harness = createTestHarness(typedQuestions.slice(0, 5));
+  harness.submitAnswer(harness.currentQuestion!.correctOptionId);
+  harness.nextQuestion(); // At Q1 (unanswered)
+
+  // Navigate backward to Q0 (answered)
+  harness.previousQuestion();
+  assert.strictEqual(harness.currentIndex, 0);
+
+  // Advance forward back to Q1 (unanswered)
+  harness.nextQuestion();
+  assert.strictEqual(harness.currentIndex, 1);
+  assert.strictEqual(harness.isAnswerSubmitted, false);
+
+  // Attempting to advance past Q1 without submitting must fail
+  const nextAttempt = harness.nextQuestion();
+  assert.strictEqual(nextAttempt, false, 'Cannot skip unanswered Q1');
+  assert.strictEqual(harness.currentIndex, 1);
+});
+
 
 // ---------------------------------------------------------
 // 6. ANSWER SOUND EFFECTS & AUDIO LOGIC TESTS

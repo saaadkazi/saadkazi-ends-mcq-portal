@@ -90,6 +90,7 @@ export interface QuizEngine {
   startQuiz: () => void;
   submitAnswer: (selectedOptionId: OptionId) => boolean;
   nextQuestion: () => boolean;
+  previousQuestion: () => boolean;
   finishQuiz: () => void;
   restartQuiz: () => void;
   startReview: (filter?: ReviewFilter) => void;

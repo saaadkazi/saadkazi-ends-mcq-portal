@@ -21,16 +21,19 @@ export const QuizView: React.FC<QuizViewProps> = ({ engine, sound: propSound }) 
     isAnswerSubmitted,
     currentAnswer,
     stats,
+    isFirstQuestion,
     isLastQuestion,
     submitAnswer,
     nextQuestion,
+    previousQuestion,
     resetToWelcome
   } = engine;
 
   const fallbackSound = useAnswerSound();
   const { isMuted, toggleMute, playAnswerSound, stopAudio } = propSound ?? fallbackSound;
 
-  // Local pending selection before submission
+  // Local pending selections by question id before submission
+  const [pendingSelections, setPendingSelections] = useState<Record<number, OptionId>>({});
   const [selectedOptionId, setSelectedOptionId] = useState<OptionId | null>(null);
 
   // Stop audio on unmount or question advancement
@@ -40,14 +43,16 @@ export const QuizView: React.FC<QuizViewProps> = ({ engine, sound: propSound }) 
     };
   }, [stopAudio]);
 
-  // Sync selection with state when question advances
+  // Sync selection with state when question advances or moves backward
   useEffect(() => {
     if (currentAnswer) {
       setSelectedOptionId(currentAnswer.selectedOptionId);
+    } else if (currentQuestion && pendingSelections[currentQuestion.id]) {
+      setSelectedOptionId(pendingSelections[currentQuestion.id]);
     } else {
       setSelectedOptionId(null);
     }
-  }, [currentIndex, currentAnswer]);
+  }, [currentIndex, currentAnswer, currentQuestion, pendingSelections]);
 
   if (!currentQuestion) {
     return null;
@@ -56,6 +61,12 @@ export const QuizView: React.FC<QuizViewProps> = ({ engine, sound: propSound }) 
   const handleSelectOption = (id: OptionId) => {
     if (!isAnswerSubmitted) {
       setSelectedOptionId(id);
+      if (currentQuestion) {
+        setPendingSelections((prev) => ({
+          ...prev,
+          [currentQuestion.id]: id
+        }));
+      }
     }
   };
 
@@ -72,6 +83,11 @@ export const QuizView: React.FC<QuizViewProps> = ({ engine, sound: propSound }) 
   const handleNext = () => {
     stopAudio();
     nextQuestion();
+  };
+
+  const handlePrevious = () => {
+    stopAudio();
+    previousQuestion();
   };
 
   const handleQuit = () => {
@@ -127,23 +143,34 @@ export const QuizView: React.FC<QuizViewProps> = ({ engine, sound: propSound }) 
         />
       )}
 
-      <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+      <div className="quiz-action-bar">
+        <Button
+          id="quiz-prev-btn"
+          variant="outline"
+          onClick={handlePrevious}
+          disabled={isFirstQuestion}
+          className="quiz-action-btn"
+          aria-label="Navigate to previous question"
+        >
+          {'\u2190 Previous'}
+        </Button>
+
         {!isAnswerSubmitted ? (
           <Button
+            id="quiz-submit-btn"
             variant="primary"
-            fullWidth
             onClick={handleSubmit}
             disabled={!selectedOptionId}
-            style={{ padding: '0.9rem' }}
+            className="quiz-action-btn"
           >
             Submit Answer
           </Button>
         ) : (
           <Button
+            id="quiz-next-btn"
             variant="primary"
-            fullWidth
             onClick={handleNext}
-            style={{ padding: '0.9rem' }}
+            className="quiz-action-btn"
           >
             {isLastQuestion ? 'Finish & View Results' : 'Next Question \u2192'}
           </Button>
