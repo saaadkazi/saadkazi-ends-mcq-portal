@@ -124,7 +124,9 @@ export const ResultView: React.FC<ResultViewProps> = ({ engine }) => {
           )}
 
           <Button variant="outline" fullWidth onClick={restartQuiz}>
-            &#8635; Retake Quiz (Fresh Random Order)
+            {engine.orderMode === 'original'
+              ? '↻ Retake Quiz (Original Order)'
+              : '↻ Retake Quiz (Fresh Random Order)'}
           </Button>
 
           <Button variant="outline" fullWidth onClick={() => startReview('all')}>

@@ -5,6 +5,7 @@ import type {
   Option,
   OptionId,
   Question,
+  QuestionOrderMode,
   QuizEngine,
   QuizViewMode,
   ReviewFilter,
@@ -17,12 +18,16 @@ const DEFAULT_QUESTIONS: readonly Question[] = rawQuestions as Question[];
 const DISPLAY_LABELS: readonly OptionId[] = ['A', 'B', 'C', 'D'];
 
 /**
- * Shuffles options for a question and assigns sequential display labels 'A', 'B', 'C', 'D'.
+ * Creates display options for a question and assigns sequential display labels 'A', 'B', 'C', 'D'.
+ * When shouldShuffle is false (Original Order Mode), preserves original source option sequence.
  * Preserves each option's permanent source ID and text.
  */
-export function createDisplayOptions(options: readonly Option[]): DisplayOption[] {
-  const shuffled = shuffleArray(options);
-  return shuffled.map((opt, index) => ({
+export function createDisplayOptions(
+  options: readonly Option[],
+  shouldShuffle: boolean = true
+): DisplayOption[] {
+  const list = shouldShuffle ? shuffleArray(options) : [...options];
+  return list.map((opt, index) => ({
     ...opt,
     displayLabel: DISPLAY_LABELS[index] ?? 'A'
   }));
@@ -31,13 +36,15 @@ export function createDisplayOptions(options: readonly Option[]): DisplayOption[
 /**
  * Quiz State Machine Hook
  *
- * Implements strict quiz progression, answer locking, independent option shuffling,
- * sequential visual display labels (A-D), accurate scoring, and review filtering.
+ * Implements strict quiz progression, answer locking, selectable ordering modes
+ * (Shuffle Mode vs Original Order Mode), sequential visual display labels (A-D),
+ * accurate scoring, and review filtering.
  */
 export function useQuizEngine(
   initialQuestions: readonly Question[] = DEFAULT_QUESTIONS
 ): QuizEngine {
   const [viewMode, setViewMode] = useState<QuizViewMode>('welcome');
+  const [orderMode, setOrderMode] = useState<QuestionOrderMode>('shuffle');
   const [activePool, setActivePool] = useState<readonly Question[]>(() => [...initialQuestions]);
   const [questions, setQuestions] = useState<Question[]>(() => [...initialQuestions]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -59,37 +66,45 @@ export function useQuizEngine(
   }, [currentQuestion, userAnswers]);
 
   /**
-   * Starts a brand new quiz session with a freshly randomized question order.
+   * Starts a brand new quiz session with the specified or active ordering mode.
    * Can accept an optional custom subset of questions (e.g. range or incorrect set).
    */
   const startQuiz = useCallback(
-    (customQuestions?: readonly Question[]) => {
+    (customQuestions?: readonly Question[], mode?: QuestionOrderMode) => {
       const poolToUse =
         customQuestions && customQuestions.length > 0
           ? [...customQuestions]
           : [...initialQuestions];
 
+      const effectiveMode = mode ?? orderMode;
+      setOrderMode(effectiveMode);
       setActivePool(poolToUse);
-      const randomized = shuffleArray(poolToUse);
-      setQuestions(randomized);
+
+      const orderedQuestions =
+        effectiveMode === 'original'
+          ? [...poolToUse]
+          : shuffleArray(poolToUse);
+
+      setQuestions(orderedQuestions);
       setCurrentIndex(0);
       setUserAnswers({});
       setIsAnswerSubmitted(false);
       setViewMode('quiz');
 
+      const shouldShuffleOpts = effectiveMode !== 'original';
       const optionsMap: Record<number, DisplayOption[]> = {};
-      randomized.forEach((q) => {
-        optionsMap[q.id] = createDisplayOptions(q.options);
+      orderedQuestions.forEach((q) => {
+        optionsMap[q.id] = createDisplayOptions(q.options, shouldShuffleOpts);
       });
       setShuffledOptionsMap(optionsMap);
 
-      if (randomized.length > 0) {
-        setCurrentShuffledOptions(optionsMap[randomized[0].id] ?? []);
+      if (orderedQuestions.length > 0) {
+        setCurrentShuffledOptions(optionsMap[orderedQuestions[0].id] ?? []);
       } else {
         setCurrentShuffledOptions([]);
       }
     },
-    [initialQuestions]
+    [initialQuestions, orderMode]
   );
 
   /**
@@ -178,14 +193,15 @@ export function useQuizEngine(
       setCurrentShuffledOptions(existingAnswer.shuffledOptions);
       setIsAnswerSubmitted(true);
     } else {
-      // Use the stable shuffled options for this question and bind sequential display labels
-      const options = shuffledOptionsMap[nextQ.id] ?? createDisplayOptions(nextQ.options);
+      // Use the stable options for this question and bind sequential display labels
+      const shouldShuffleOpts = orderMode !== 'original';
+      const options = shuffledOptionsMap[nextQ.id] ?? createDisplayOptions(nextQ.options, shouldShuffleOpts);
       setCurrentShuffledOptions(options);
       setIsAnswerSubmitted(false);
     }
 
     return true;
-  }, [currentQuestion, isAnswerSubmitted, currentIndex, questions, userAnswers, shuffledOptionsMap]);
+  }, [currentQuestion, isAnswerSubmitted, currentIndex, questions, userAnswers, shuffledOptionsMap, orderMode]);
 
   /**
    * Navigates to the previous question.
@@ -212,13 +228,14 @@ export function useQuizEngine(
       setCurrentShuffledOptions(existingAnswer.shuffledOptions);
       setIsAnswerSubmitted(true);
     } else {
-      const options = shuffledOptionsMap[prevQ.id] ?? createDisplayOptions(prevQ.options);
+      const shouldShuffleOpts = orderMode !== 'original';
+      const options = shuffledOptionsMap[prevQ.id] ?? createDisplayOptions(prevQ.options, shouldShuffleOpts);
       setCurrentShuffledOptions(options);
       setIsAnswerSubmitted(false);
     }
 
     return true;
-  }, [viewMode, currentIndex, questions, userAnswers, shuffledOptionsMap]);
+  }, [viewMode, currentIndex, questions, userAnswers, shuffledOptionsMap, orderMode]);
 
   /**
    * Finishes the quiz and transitions to results.
@@ -228,33 +245,39 @@ export function useQuizEngine(
   }, []);
 
   /**
-   * Restarts the quiz with all answers cleared and a fresh randomized attempt
-   * using the currently active pool of questions (presets, custom range, or incorrect set).
+   * Restarts the quiz with all answers cleared.
+   * In Original Order Mode, preserves original question sequence and original option order.
+   * In Shuffle Mode, produces a freshly randomized attempt.
    */
   const restartQuiz = useCallback(() => {
-    const randomized = shuffleArray(activePool);
-    setQuestions(randomized);
+    const orderedQuestions =
+      orderMode === 'original'
+        ? [...activePool]
+        : shuffleArray(activePool);
+
+    setQuestions(orderedQuestions);
     setCurrentIndex(0);
     setUserAnswers({});
     setIsAnswerSubmitted(false);
     setViewMode('quiz');
 
+    const shouldShuffleOpts = orderMode !== 'original';
     const optionsMap: Record<number, DisplayOption[]> = {};
-    randomized.forEach((q) => {
-      optionsMap[q.id] = createDisplayOptions(q.options);
+    orderedQuestions.forEach((q) => {
+      optionsMap[q.id] = createDisplayOptions(q.options, shouldShuffleOpts);
     });
     setShuffledOptionsMap(optionsMap);
 
-    if (randomized.length > 0) {
-      setCurrentShuffledOptions(optionsMap[randomized[0].id] ?? []);
+    if (orderedQuestions.length > 0) {
+      setCurrentShuffledOptions(optionsMap[orderedQuestions[0].id] ?? []);
     } else {
       setCurrentShuffledOptions([]);
     }
-  }, [activePool]);
+  }, [activePool, orderMode]);
 
   /**
    * Starts a brand new practice session targeting only questions answered incorrectly
-   * in the completed session, keeping options shuffled and permanent IDs intact.
+   * in the completed session, keeping the selected ordering mode intact.
    */
   const startIncorrectPractice = useCallback(() => {
     const incorrectIds = new Set(
@@ -267,10 +290,10 @@ export function useQuizEngine(
       return;
     }
 
-    // Select questions using their original Excel IDs before shuffling
+    // Select questions using their original Excel IDs before starting
     const incorrectQuestions = initialQuestions.filter((q) => incorrectIds.has(q.id));
-    startQuiz(incorrectQuestions);
-  }, [userAnswers, initialQuestions, startQuiz]);
+    startQuiz(incorrectQuestions, orderMode);
+  }, [userAnswers, initialQuestions, startQuiz, orderMode]);
 
   /**
    * Initiates review mode.
@@ -291,6 +314,7 @@ export function useQuizEngine(
     setCurrentShuffledOptions([]);
     setShuffledOptionsMap({});
     setActivePool([...initialQuestions]);
+    setOrderMode('shuffle');
   }, [initialQuestions]);
 
   // Compute analytics
@@ -307,6 +331,7 @@ export function useQuizEngine(
 
   return {
     viewMode,
+    orderMode,
     questions,
     currentIndex,
     currentQuestion,

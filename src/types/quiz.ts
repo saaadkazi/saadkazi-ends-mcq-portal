@@ -69,9 +69,12 @@ export interface QuizState {
   reviewFilter: ReviewFilter;
 }
 
+export type QuestionOrderMode = 'shuffle' | 'original';
+
 export interface QuizEngine {
   // State
   viewMode: QuizViewMode;
+  orderMode: QuestionOrderMode;
   questions: Question[];
   currentIndex: number;
   currentQuestion: Question | null;
@@ -88,7 +91,7 @@ export interface QuizEngine {
   isLastQuestion: boolean;
   
   // Actions
-  startQuiz: (customQuestions?: readonly Question[]) => void;
+  startQuiz: (customQuestions?: readonly Question[], mode?: QuestionOrderMode) => void;
   startIncorrectPractice: () => void;
   submitAnswer: (selectedOptionId: OptionId) => boolean;
   nextQuestion: () => boolean;

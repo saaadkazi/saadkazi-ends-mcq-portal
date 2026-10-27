@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import rawQuestions from '../data/questions.json';
-import type { Question } from '../types/quiz';
+import type { Question, QuestionOrderMode } from '../types/quiz';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
@@ -38,7 +38,7 @@ export function validateRange(start: number, end: number, min = 1, max = 100): R
 }
 
 /**
- * Selects questions using original Excel IDs before shuffling.
+ * Selects questions using original Excel IDs before shuffling or ordering.
  */
 export function filterQuestionsByRange(
   questions: readonly Question[],
@@ -51,7 +51,7 @@ export function filterQuestionsByRange(
 export interface WelcomeViewProps {
   totalQuestions?: number;
   allQuestions?: readonly Question[];
-  onStartQuiz: (customQuestions?: readonly Question[]) => void;
+  onStartQuiz: (customQuestions?: readonly Question[], mode?: QuestionOrderMode) => void;
   isMuted?: boolean;
   onToggleMute?: () => void;
 }
@@ -62,6 +62,7 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
   isMuted = false,
   onToggleMute
 }) => {
+  const [orderMode, setOrderMode] = useState<QuestionOrderMode>('shuffle');
   const [mode, setMode] = useState<'preset' | 'custom'>('preset');
   const [selectedPreset, setSelectedPreset] = useState<FixedPreset>(100);
   const [customStart, setCustomStart] = useState<string>('1');
@@ -91,7 +92,7 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
     if (isStartDisabled || selectedQuestions.length === 0) {
       return;
     }
-    onStartQuiz(selectedQuestions);
+    onStartQuiz(selectedQuestions, orderMode);
   };
 
   return (
@@ -122,11 +123,126 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
       </div>
 
       <Card>
-        {/* Practice Set Mode Selector */}
+        {/* Step 1: Select Ordering Mode */}
+        <div style={{ marginBottom: '1.75rem', paddingBottom: '1.25rem', borderBottom: '1px solid var(--border-subtle)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+              Step 1: Select Ordering Mode
+            </h2>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+              Active: {orderMode === 'shuffle' ? 'Shuffle Mode' : 'Original Order'}
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '0.75rem',
+              marginBottom: '0.75rem'
+            }}
+            role="radiogroup"
+            aria-label="Question and option ordering mode"
+          >
+            {/* Shuffle Mode Card */}
+            <button
+              type="button"
+              role="radio"
+              aria-checked={orderMode === 'shuffle'}
+              onClick={() => setOrderMode('shuffle')}
+              id="order-mode-shuffle-btn"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                textAlign: 'left',
+                padding: '0.85rem 1rem',
+                borderRadius: 'var(--radius-lg)',
+                border: `2px solid ${orderMode === 'shuffle' ? 'var(--color-primary)' : 'var(--border-subtle)'}`,
+                backgroundColor: orderMode === 'shuffle' ? 'var(--color-accent-subtle)' : 'var(--bg-app)',
+                cursor: 'pointer',
+                transition: 'all var(--transition-fast)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '0.35rem' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                  🔀 Shuffle Mode
+                </span>
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    padding: '0.15rem 0.45rem',
+                    borderRadius: 'var(--radius-full)',
+                    backgroundColor: orderMode === 'shuffle' ? 'var(--color-primary)' : 'var(--bg-surface-subtle)',
+                    color: orderMode === 'shuffle' ? '#FFFFFF' : 'var(--text-muted)'
+                  }}
+                >
+                  Default
+                </span>
+              </div>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                Questions and options are randomized for practice.
+              </p>
+            </button>
+
+            {/* Original Order Mode Card */}
+            <button
+              type="button"
+              role="radio"
+              aria-checked={orderMode === 'original'}
+              onClick={() => setOrderMode('original')}
+              id="order-mode-original-btn"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                textAlign: 'left',
+                padding: '0.85rem 1rem',
+                borderRadius: 'var(--radius-lg)',
+                border: `2px solid ${orderMode === 'original' ? 'var(--color-primary)' : 'var(--border-subtle)'}`,
+                backgroundColor: orderMode === 'original' ? 'var(--color-accent-subtle)' : 'var(--bg-app)',
+                cursor: 'pointer',
+                transition: 'all var(--transition-fast)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '0.35rem' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                  📋 Original Order Mode
+                </span>
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    padding: '0.15rem 0.45rem',
+                    borderRadius: 'var(--radius-full)',
+                    backgroundColor: orderMode === 'original' ? 'var(--color-primary)' : 'var(--bg-surface-subtle)',
+                    color: orderMode === 'original' ? '#FFFFFF' : 'var(--text-muted)'
+                  }}
+                >
+                  Excel Order
+                </span>
+              </div>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                Questions and options follow the original Excel order.
+              </p>
+            </button>
+          </div>
+
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4, margin: 0 }}>
+            💡 <strong>Note:</strong> Original Order Mode is useful for ordered revision, while Shuffle Mode provides randomized practice.
+          </p>
+        </div>
+
+        {/* Step 2: Select Practice Mode */}
         <div style={{ marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Select Practice Mode
+            <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+              Step 2: Select Practice Set
             </h2>
             <div style={{ display: 'flex', gap: '0.35rem', backgroundColor: 'var(--bg-app)', padding: '0.2rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
               <button
@@ -344,10 +460,10 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
           </div>
           <div style={{ padding: '0.75rem', backgroundColor: 'var(--bg-app)', borderRadius: 'var(--radius-md)', textAlign: 'center', border: '1px solid var(--border-subtle)' }}>
             <span style={{ display: 'block', fontSize: '1.35rem', fontWeight: 800, color: 'var(--color-accent-primary)' }}>
-              Shuffled
+              {orderMode === 'original' ? 'Original' : 'Shuffled'}
             </span>
             <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              Questions & Options
+              {orderMode === 'original' ? 'Excel Sequence' : 'Questions & Options'}
             </span>
           </div>
           <div style={{ padding: '0.75rem', backgroundColor: 'var(--bg-app)', borderRadius: 'var(--radius-md)', textAlign: 'center', border: '1px solid var(--border-subtle)' }}>
@@ -362,7 +478,10 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
 
         <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
           <li>
-            <strong>Pre-Filtered Shuffling:</strong> Selected questions are filtered by original Excel ID before being randomized for the session.
+            <strong>{orderMode === 'original' ? 'Sequential Order:' : 'Pre-Filtered Shuffling:'}</strong>{' '}
+            {orderMode === 'original'
+              ? 'Questions follow original Excel order and options remain locked to A, B, C, D.'
+              : 'Selected questions are filtered by original Excel ID before being randomized for the session.'}
           </li>
           <li>
             <strong>Single Submission:</strong> Once you submit an answer, it is locked immediately to prevent guessing.

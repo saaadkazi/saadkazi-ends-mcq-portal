@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import questionsData from '../src/data/questions.json';
 import { createDisplayOptions } from '../src/hooks/useQuizEngine';
 import { filterQuestionsByRange, validateRange, FIXED_PRESETS } from '../src/pages/WelcomeView';
-import type { DisplayOption, OptionId, Question, UserAnswer } from '../src/types/quiz';
+import type { DisplayOption, OptionId, Question, QuestionOrderMode, UserAnswer } from '../src/types/quiz';
 import { calculateAccuracy, calculatePercentage, calculateQuizStats, getPerformanceTier } from '../src/utils/scoring';
 import { shuffleArray } from '../src/utils/shuffle';
 import {
@@ -250,13 +250,18 @@ test('calculateQuizStats aggregates correct metrics', () => {
 console.log('\n--- 5. Testing Quiz State Machine Logic ---');
 
 // Test harness replicating the updated hook state machine
-function createTestHarness(questions: readonly Question[]) {
+function createTestHarness(
+  questions: readonly Question[],
+  initialOrderMode: QuestionOrderMode = 'shuffle'
+) {
+  let orderMode: QuestionOrderMode = initialOrderMode;
   let activePool = [...questions];
-  let questionsList = shuffleArray(activePool);
+  let questionsList = orderMode === 'original' ? [...activePool] : shuffleArray(activePool);
   let currentIndex = 0;
   const optionsMap: Record<number, DisplayOption[]> = {};
+  const initialShuffleOpts = orderMode !== 'original';
   questionsList.forEach((q) => {
-    optionsMap[q.id] = createDisplayOptions(q.options);
+    optionsMap[q.id] = createDisplayOptions(q.options, initialShuffleOpts);
   });
   let currentShuffledOptions: DisplayOption[] =
     questionsList.length > 0 ? (optionsMap[questionsList[0].id] ?? []) : [];
@@ -266,6 +271,7 @@ function createTestHarness(questions: readonly Question[]) {
 
   return {
     get viewMode() { return viewMode; },
+    get orderMode() { return orderMode; },
     get currentIndex() { return currentIndex; },
     get currentQuestion() { return questionsList[currentIndex] ?? null; },
     get currentShuffledOptions() { return currentShuffledOptions; },
@@ -276,15 +282,17 @@ function createTestHarness(questions: readonly Question[]) {
     get isFirstQuestion() { return currentIndex === 0; },
     get isLastQuestion() { return currentIndex === questionsList.length - 1; },
 
-    startQuiz(customQuestions?: readonly Question[]): void {
+    startQuiz(customQuestions?: readonly Question[], mode?: QuestionOrderMode): void {
+      if (mode) orderMode = mode;
       activePool = customQuestions && customQuestions.length > 0 ? [...customQuestions] : [...questions];
-      questionsList = shuffleArray(activePool);
+      questionsList = orderMode === 'original' ? [...activePool] : shuffleArray(activePool);
       currentIndex = 0;
       userAnswers = {};
       isAnswerSubmitted = false;
       viewMode = 'quiz';
+      const shuffleOpts = orderMode !== 'original';
       for (const q of questionsList) {
-        optionsMap[q.id] = createDisplayOptions(q.options);
+        optionsMap[q.id] = createDisplayOptions(q.options, shuffleOpts);
       }
       currentShuffledOptions = questionsList.length > 0 ? (optionsMap[questionsList[0].id] ?? []) : [];
     },
@@ -297,7 +305,7 @@ function createTestHarness(questions: readonly Question[]) {
       );
       if (incorrectIds.size === 0) return;
       const incorrectQuestions = questions.filter((q) => incorrectIds.has(q.id));
-      this.startQuiz(incorrectQuestions);
+      this.startQuiz(incorrectQuestions, orderMode);
     },
 
     submitAnswer(optionId: OptionId): boolean {
@@ -344,7 +352,8 @@ function createTestHarness(questions: readonly Question[]) {
         currentShuffledOptions = existing.shuffledOptions;
         isAnswerSubmitted = true;
       } else {
-        currentShuffledOptions = optionsMap[nextQ.id] ?? createDisplayOptions(nextQ.options);
+        const shuffleOpts = orderMode !== 'original';
+        currentShuffledOptions = optionsMap[nextQ.id] ?? createDisplayOptions(nextQ.options, shuffleOpts);
         isAnswerSubmitted = false;
       }
       return true;
@@ -362,20 +371,22 @@ function createTestHarness(questions: readonly Question[]) {
         currentShuffledOptions = existing.shuffledOptions;
         isAnswerSubmitted = true;
       } else {
-        currentShuffledOptions = optionsMap[prevQ.id] ?? createDisplayOptions(prevQ.options);
+        const shuffleOpts = orderMode !== 'original';
+        currentShuffledOptions = optionsMap[prevQ.id] ?? createDisplayOptions(prevQ.options, shuffleOpts);
         isAnswerSubmitted = false;
       }
       return true;
     },
 
     restart(): void {
-      questionsList = shuffleArray(activePool);
+      questionsList = orderMode === 'original' ? [...activePool] : shuffleArray(activePool);
       currentIndex = 0;
       userAnswers = {};
       isAnswerSubmitted = false;
       viewMode = 'quiz';
+      const shuffleOpts = orderMode !== 'original';
       for (const q of questionsList) {
-        optionsMap[q.id] = createDisplayOptions(q.options);
+        optionsMap[q.id] = createDisplayOptions(q.options, shuffleOpts);
       }
       if (questionsList.length > 0) {
         currentShuffledOptions = optionsMap[questionsList[0].id] ?? [];
@@ -391,6 +402,7 @@ function createTestHarness(questions: readonly Question[]) {
       viewMode = 'welcome';
       currentShuffledOptions = [];
       activePool = [...questions];
+      orderMode = 'shuffle';
     }
   };
 }
@@ -1155,6 +1167,260 @@ test('Single-Question Quiz Navigation: isFirstQuestion and isLastQuestion are bo
   const advanced = harness.nextQuestion();
   assert.strictEqual(advanced, true);
   assert.strictEqual(harness.viewMode, 'result');
+});
+
+// ---------------------------------------------------------
+// 9. ORDERING MODES (ORIGINAL ORDER VS SHUFFLE MODE) TESTS
+// ---------------------------------------------------------
+console.log('\n--- 9. Testing Original Order Mode vs Shuffle Mode ---');
+
+test('Section 8.1: Shuffle Mode continues using existing question and option randomization', () => {
+  const harness = createTestHarness(typedQuestions, 'shuffle');
+  assert.strictEqual(harness.orderMode, 'shuffle');
+  assert.strictEqual(harness.questionsList.length, 100);
+
+  // Across 10 fresh starts in shuffle mode, question order and option order will differ from the original 1..100
+  let questionsDiffered = false;
+  let optionsDiffered = false;
+  for (let i = 0; i < 10; i++) {
+    const freshHarness = createTestHarness(typedQuestions, 'shuffle');
+    const ids = freshHarness.questionsList.map((q) => q.id);
+    if (ids.some((id, idx) => id !== idx + 1)) {
+      questionsDiffered = true;
+    }
+    const q1Opts = freshHarness.currentShuffledOptions.map((o) => o.id);
+    if (q1Opts.some((id, idx) => id !== ['A', 'B', 'C', 'D'][idx])) {
+      optionsDiffered = true;
+    }
+    if (questionsDiffered && optionsDiffered) break;
+  }
+  assert.ok(questionsDiffered, 'Shuffle Mode must randomize question ordering');
+  assert.ok(optionsDiffered, 'Shuffle Mode must randomize option ordering');
+});
+
+test('Section 8.2: Original Order Mode strictly preserves the source question order', () => {
+  const harness = createTestHarness(typedQuestions, 'original');
+  assert.strictEqual(harness.orderMode, 'original');
+  assert.strictEqual(harness.questionsList.length, 100);
+
+  // Verify all 100 questions are in exact order 1..100
+  const ids = harness.questionsList.map((q) => q.id);
+  const expectedIds = Array.from({ length: 100 }, (_, i) => i + 1);
+  assert.deepStrictEqual(ids, expectedIds, 'Original Order Mode must preserve exact 1..100 question sequence');
+});
+
+test('Section 8.3: Original Order Mode preserves original option IDs and A, B, C, D display labels', () => {
+  const harness = createTestHarness(typedQuestions, 'original');
+
+  // Verify options for all 100 questions in Original Order Mode
+  harness.questionsList.forEach((q) => {
+    const dispOpts = createDisplayOptions(q.options, false);
+    assert.strictEqual(dispOpts.length, 4);
+
+    // Option IDs and displayLabels must match exactly: index 0->A, 1->B, 2->C, 3->D
+    const expected = ['A', 'B', 'C', 'D'];
+    dispOpts.forEach((opt, idx) => {
+      assert.strictEqual(opt.id, expected[idx], `Q${q.id} option at ${idx} must have id ${expected[idx]}`);
+      assert.strictEqual(opt.displayLabel, expected[idx], `Q${q.id} option at ${idx} must have displayLabel ${expected[idx]}`);
+      assert.strictEqual(opt.text, q.options[idx].text, `Q${q.id} option text must match original source text`);
+    });
+  });
+});
+
+test('Section 8.4: Correct-answer mapping evaluates accurately in both modes', () => {
+  const subset = typedQuestions.slice(0, 10);
+
+  // 1. Original Order Mode
+  const originalHarness = createTestHarness(subset, 'original');
+  for (let i = 0; i < 5; i++) {
+    const q = originalHarness.currentQuestion!;
+    const correctOpt = q.correctOptionId;
+    originalHarness.submitAnswer(correctOpt);
+    assert.strictEqual(originalHarness.userAnswers[q.id].isCorrect, true);
+    assert.strictEqual(originalHarness.userAnswers[q.id].selectedDisplayLabel, correctOpt);
+    originalHarness.nextQuestion();
+  }
+  for (let i = 5; i < 10; i++) {
+    const q = originalHarness.currentQuestion!;
+    const wrongOpt = q.options.find((o) => o.id !== q.correctOptionId)!.id;
+    originalHarness.submitAnswer(wrongOpt);
+    assert.strictEqual(originalHarness.userAnswers[q.id].isCorrect, false);
+    originalHarness.nextQuestion();
+  }
+
+  // 2. Shuffle Mode
+  const shuffleHarness = createTestHarness(subset, 'shuffle');
+  for (let i = 0; i < 10; i++) {
+    const q = shuffleHarness.currentQuestion!;
+    const correctOpt = q.correctOptionId;
+    shuffleHarness.submitAnswer(correctOpt);
+    const ans = shuffleHarness.userAnswers[q.id];
+    assert.strictEqual(ans.isCorrect, true, 'Permanent source ID match must evaluate correct');
+    assert.strictEqual(ans.selectedOptionId, correctOpt);
+    assert.strictEqual(ans.correctOptionId, correctOpt);
+    shuffleHarness.nextQuestion();
+  }
+});
+
+test('Section 8.5: All existing preset ranges work correctly in both modes', () => {
+  for (const preset of FIXED_PRESETS) {
+    const start = 1;
+    const end = preset;
+    const count = preset;
+    const filtered = filterQuestionsByRange(typedQuestions, start, end);
+    assert.strictEqual(filtered.length, count, `Preset ${count} must yield ${count} questions`);
+
+    // Test Original Order Mode for this preset
+    const origHarness = createTestHarness(filtered, 'original');
+    assert.strictEqual(origHarness.questionsList.length, count);
+    const origIds = origHarness.questionsList.map((q) => q.id);
+    for (let id = start; id <= end; id++) {
+      assert.strictEqual(origIds[id - start], id, `Preset ${count} in original mode must be sequentially ordered`);
+    }
+
+    // Test Shuffle Mode for this preset
+    const shufHarness = createTestHarness(filtered, 'shuffle');
+    assert.strictEqual(shufHarness.questionsList.length, count);
+    shufHarness.questionsList.forEach((q) => {
+      assert.ok(q.id >= start && q.id <= end, `Question ${q.id} must be within preset boundaries`);
+    });
+  }
+});
+
+test('Section 8.6: Custom ranges preserve correct counts and boundaries in both modes', () => {
+  const range20_40 = filterQuestionsByRange(typedQuestions, 20, 40);
+  assert.strictEqual(range20_40.length, 21);
+
+  // Original Order Mode
+  const origHarness = createTestHarness(range20_40, 'original');
+  assert.strictEqual(origHarness.questionsList.length, 21);
+  const origIds = origHarness.questionsList.map((q) => q.id);
+  const expected20_40 = Array.from({ length: 21 }, (_, i) => 20 + i);
+  assert.deepStrictEqual(origIds, expected20_40, 'Original Order Mode custom range 20-40 must be exactly 20..40');
+
+  // Shuffle Mode
+  const shufHarness = createTestHarness(range20_40, 'shuffle');
+  assert.strictEqual(shufHarness.questionsList.length, 21);
+  shufHarness.questionsList.forEach((q) => {
+    assert.ok(q.id >= 20 && q.id <= 40, `Shuffle Mode question ${q.id} must be within 20..40`);
+  });
+});
+
+test('Section 8.7: Restart and retake preserve the selected mode and intended ordering behaviour', () => {
+  // 1. Original Order Mode Restart
+  const subset = filterQuestionsByRange(typedQuestions, 10, 15); // 6 questions
+  const origHarness = createTestHarness(subset, 'original');
+
+  origHarness.submitAnswer('A');
+  origHarness.nextQuestion();
+  origHarness.submitAnswer('B');
+  origHarness.nextQuestion();
+  assert.strictEqual(origHarness.currentIndex, 2);
+
+  // Restart
+  origHarness.restart();
+  assert.strictEqual(origHarness.orderMode, 'original', 'Restart must preserve original orderMode');
+  assert.strictEqual(origHarness.currentIndex, 0);
+  assert.strictEqual(origHarness.questionsList.length, 6);
+  assert.deepStrictEqual(
+    origHarness.questionsList.map((q) => q.id),
+    [10, 11, 12, 13, 14, 15],
+    'Restart in Original Order Mode must preserve exact 10..15 sequence'
+  );
+  const opts = origHarness.currentShuffledOptions.map((o) => o.displayLabel);
+  assert.deepStrictEqual(opts, ['A', 'B', 'C', 'D']);
+
+  // 2. Shuffle Mode Restart
+  const shufHarness = createTestHarness(subset, 'shuffle');
+  shufHarness.submitAnswer('A');
+  shufHarness.nextQuestion();
+  shufHarness.restart();
+  assert.strictEqual(shufHarness.orderMode, 'shuffle', 'Restart must preserve shuffle orderMode');
+  assert.strictEqual(shufHarness.questionsList.length, 6);
+});
+
+test('Section 8.8: Previous/Next navigation does not change option ordering in either mode', () => {
+  // Original Order Mode
+  const origHarness = createTestHarness(typedQuestions.slice(0, 3), 'original');
+  const q0OptsOrig = [...origHarness.currentShuffledOptions];
+  origHarness.submitAnswer(q0OptsOrig[0].id);
+  origHarness.nextQuestion();
+
+  const q1OptsOrig = [...origHarness.currentShuffledOptions];
+  origHarness.submitAnswer(q1OptsOrig[0].id);
+
+  // Navigate back to Q0
+  origHarness.previousQuestion();
+  assert.strictEqual(origHarness.currentIndex, 0);
+  assert.deepStrictEqual(
+    origHarness.currentShuffledOptions.map((o) => o.id),
+    q0OptsOrig.map((o) => o.id),
+    'Navigating back must retain original question 0 options'
+  );
+
+  // Shuffle Mode
+  const shufHarness = createTestHarness(typedQuestions.slice(0, 3), 'shuffle');
+  const q0OptsShuf = [...shufHarness.currentShuffledOptions];
+  shufHarness.submitAnswer(q0OptsShuf[0].id);
+  shufHarness.nextQuestion();
+
+  shufHarness.previousQuestion();
+  assert.strictEqual(shufHarness.currentIndex, 0);
+  assert.deepStrictEqual(
+    shufHarness.currentShuffledOptions.map((o) => o.id),
+    q0OptsShuf.map((o) => o.id),
+    'Navigating back in Shuffle Mode must retain locked shuffled options'
+  );
+});
+
+test('Section 8.9: Incorrect-question practice respects the selected mode', () => {
+  const subset = typedQuestions.slice(0, 10);
+  const origHarness = createTestHarness(subset, 'original');
+
+  // Make Q2 (id 2), Q5 (id 5), Q8 (id 8) incorrect
+  for (let i = 0; i < 10; i++) {
+    const q = origHarness.currentQuestion!;
+    if (q.id === 2 || q.id === 5 || q.id === 8) {
+      const wrong = q.options.find((o) => o.id !== q.correctOptionId)!.id;
+      origHarness.submitAnswer(wrong);
+    } else {
+      origHarness.submitAnswer(q.correctOptionId);
+    }
+    origHarness.nextQuestion();
+  }
+  assert.strictEqual(origHarness.viewMode, 'result');
+
+  // Start incorrect practice
+  origHarness.startIncorrectPractice();
+  assert.strictEqual(origHarness.orderMode, 'original', 'Incorrect practice must inherit original orderMode');
+  assert.strictEqual(origHarness.questionsList.length, 3);
+  assert.deepStrictEqual(
+    origHarness.questionsList.map((q) => q.id),
+    [2, 5, 8],
+    'Incorrect questions must appear in original relative order [2, 5, 8]'
+  );
+  const firstQOpts = origHarness.currentShuffledOptions.map((o) => o.displayLabel);
+  assert.deepStrictEqual(firstQOpts, ['A', 'B', 'C', 'D']);
+});
+
+test('Section 8.10: Single-question range works in both modes', () => {
+  const singleRange = filterQuestionsByRange(typedQuestions, 42, 42);
+  assert.strictEqual(singleRange.length, 1);
+  assert.strictEqual(singleRange[0].id, 42);
+
+  // Original Order Mode
+  const origHarness = createTestHarness(singleRange, 'original');
+  assert.strictEqual(origHarness.questionsList.length, 1);
+  assert.strictEqual(origHarness.currentQuestion!.id, 42);
+  assert.strictEqual(origHarness.isFirstQuestion, true);
+  assert.strictEqual(origHarness.isLastQuestion, true);
+
+  // Shuffle Mode
+  const shufHarness = createTestHarness(singleRange, 'shuffle');
+  assert.strictEqual(shufHarness.questionsList.length, 1);
+  assert.strictEqual(shufHarness.currentQuestion!.id, 42);
+  assert.strictEqual(shufHarness.isFirstQuestion, true);
+  assert.strictEqual(shufHarness.isLastQuestion, true);
 });
 
 // ---------------------------------------------------------
