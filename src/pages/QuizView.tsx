@@ -116,7 +116,10 @@ export const QuizView: React.FC<QuizViewProps> = ({ engine, sound: propSound }) 
       <QuizHeader
         currentIndex={currentIndex}
         totalQuestions={questions.length}
+        answeredCount={stats.answeredCount}
         correctCount={stats.correctCount}
+        incorrectCount={stats.incorrectCount}
+        accuracyPercentage={stats.accuracyPercentage}
         onQuit={handleQuit}
         isMuted={isMuted}
         onToggleMute={toggleMute}

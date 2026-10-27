@@ -55,6 +55,7 @@ export interface QuizStats {
   correctCount: number;
   incorrectCount: number;
   scorePercentage: number;
+  accuracyPercentage: number;
   performanceTier: PerformanceTier;
 }
 
@@ -87,7 +88,8 @@ export interface QuizEngine {
   isLastQuestion: boolean;
   
   // Actions
-  startQuiz: () => void;
+  startQuiz: (customQuestions?: readonly Question[]) => void;
+  startIncorrectPractice: () => void;
   submitAnswer: (selectedOptionId: OptionId) => boolean;
   nextQuestion: () => boolean;
   previousQuestion: () => boolean;

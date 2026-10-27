@@ -101,13 +101,23 @@ export const ReviewView: React.FC<ReviewViewProps> = ({ engine }) => {
       )}
 
       {/* Bottom Sticky Action Bar */}
-      <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', justifyContent: 'space-between', flexWrap: 'wrap' }}>
         <Button variant="outline" onClick={finishQuiz}>
           &larr; Back to Results
         </Button>
-        <Button variant="primary" onClick={restartQuiz}>
-          &#8635; Retake Quiz
-        </Button>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <Button
+            variant="secondary"
+            onClick={engine.startIncorrectPractice}
+            disabled={stats.incorrectCount === 0}
+            title={stats.incorrectCount === 0 ? 'No incorrect questions to practise' : 'Practise only incorrect questions'}
+          >
+            ⚡ Practise Incorrect ({stats.incorrectCount})
+          </Button>
+          <Button variant="primary" onClick={restartQuiz}>
+            &#8635; Retake Quiz
+          </Button>
+        </div>
       </div>
     </div>
   );

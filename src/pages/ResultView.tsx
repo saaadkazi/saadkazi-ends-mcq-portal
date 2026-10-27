@@ -9,8 +9,8 @@ export interface ResultViewProps {
 }
 
 export const ResultView: React.FC<ResultViewProps> = ({ engine }) => {
-  const { stats, restartQuiz, startReview, resetToWelcome } = engine;
-  const { totalQuestions, correctCount, incorrectCount, scorePercentage, performanceTier } = stats;
+  const { stats, restartQuiz, startReview, resetToWelcome, startIncorrectPractice } = engine;
+  const { totalQuestions, correctCount, incorrectCount, scorePercentage, accuracyPercentage, performanceTier } = stats;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: 'auto 0' }}>
@@ -22,7 +22,7 @@ export const ResultView: React.FC<ResultViewProps> = ({ engine }) => {
           Practice Results
         </h1>
         <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
-          Review your performance metrics across all 100 Entrepreneurship Development questions.
+          Review your performance metrics across all {totalQuestions} questions.
         </p>
       </div>
 
@@ -32,7 +32,7 @@ export const ResultView: React.FC<ResultViewProps> = ({ engine }) => {
             {scorePercentage}%
           </span>
           <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-            Score: {correctCount} / {totalQuestions} Correct
+            Score: {correctCount} / {totalQuestions} Correct &bull; Accuracy: {accuracyPercentage}%
           </span>
         </div>
 
@@ -96,12 +96,39 @@ export const ResultView: React.FC<ResultViewProps> = ({ engine }) => {
 
         {/* Action Buttons */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <Button variant="primary" fullWidth onClick={restartQuiz}>
+          <Button
+            variant="primary"
+            fullWidth
+            onClick={startIncorrectPractice}
+            disabled={incorrectCount === 0}
+            id="practise-incorrect-btn"
+          >
+            Practise Incorrect Questions ({incorrectCount})
+          </Button>
+
+          {incorrectCount === 0 && (
+            <div
+              style={{
+                padding: '0.6rem 0.9rem',
+                backgroundColor: 'var(--color-success-bg)',
+                border: '1px solid var(--color-success-border)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--color-success-text)',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                textAlign: 'center'
+              }}
+            >
+              🎉 Perfect Score! No incorrect questions to practise.
+            </div>
+          )}
+
+          <Button variant="outline" fullWidth onClick={restartQuiz}>
             &#8635; Retake Quiz (Fresh Random Order)
           </Button>
 
           <Button variant="outline" fullWidth onClick={() => startReview('all')}>
-            Review All Answers (100)
+            Review All Answers ({totalQuestions})
           </Button>
 
           <Button

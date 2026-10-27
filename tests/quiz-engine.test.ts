@@ -1,8 +1,9 @@
 import assert from 'node:assert';
 import questionsData from '../src/data/questions.json';
 import { createDisplayOptions } from '../src/hooks/useQuizEngine';
+import { filterQuestionsByRange, validateRange, FIXED_PRESETS } from '../src/pages/WelcomeView';
 import type { DisplayOption, OptionId, Question, UserAnswer } from '../src/types/quiz';
-import { calculatePercentage, calculateQuizStats, getPerformanceTier } from '../src/utils/scoring';
+import { calculateAccuracy, calculatePercentage, calculateQuizStats, getPerformanceTier } from '../src/utils/scoring';
 import { shuffleArray } from '../src/utils/shuffle';
 import {
   CORRECT_SOUND,
@@ -250,7 +251,8 @@ console.log('\n--- 5. Testing Quiz State Machine Logic ---');
 
 // Test harness replicating the updated hook state machine
 function createTestHarness(questions: readonly Question[]) {
-  let questionsList = shuffleArray(questions);
+  let activePool = [...questions];
+  let questionsList = shuffleArray(activePool);
   let currentIndex = 0;
   const optionsMap: Record<number, DisplayOption[]> = {};
   questionsList.forEach((q) => {
@@ -270,8 +272,33 @@ function createTestHarness(questions: readonly Question[]) {
     get userAnswers() { return userAnswers; },
     get isAnswerSubmitted() { return isAnswerSubmitted; },
     get questionsList() { return questionsList; },
+    get activePool() { return activePool; },
     get isFirstQuestion() { return currentIndex === 0; },
     get isLastQuestion() { return currentIndex === questionsList.length - 1; },
+
+    startQuiz(customQuestions?: readonly Question[]): void {
+      activePool = customQuestions && customQuestions.length > 0 ? [...customQuestions] : [...questions];
+      questionsList = shuffleArray(activePool);
+      currentIndex = 0;
+      userAnswers = {};
+      isAnswerSubmitted = false;
+      viewMode = 'quiz';
+      for (const q of questionsList) {
+        optionsMap[q.id] = createDisplayOptions(q.options);
+      }
+      currentShuffledOptions = questionsList.length > 0 ? (optionsMap[questionsList[0].id] ?? []) : [];
+    },
+
+    startIncorrectPractice(): void {
+      const incorrectIds = new Set(
+        Object.values(userAnswers)
+          .filter((ans) => !ans.isCorrect)
+          .map((ans) => ans.questionId)
+      );
+      if (incorrectIds.size === 0) return;
+      const incorrectQuestions = questions.filter((q) => incorrectIds.has(q.id));
+      this.startQuiz(incorrectQuestions);
+    },
 
     submitAnswer(optionId: OptionId): boolean {
       const q = questionsList[currentIndex];
@@ -342,7 +369,7 @@ function createTestHarness(questions: readonly Question[]) {
     },
 
     restart(): void {
-      questionsList = shuffleArray(questions);
+      questionsList = shuffleArray(activePool);
       currentIndex = 0;
       userAnswers = {};
       isAnswerSubmitted = false;
@@ -352,6 +379,8 @@ function createTestHarness(questions: readonly Question[]) {
       }
       if (questionsList.length > 0) {
         currentShuffledOptions = optionsMap[questionsList[0].id] ?? [];
+      } else {
+        currentShuffledOptions = [];
       }
     },
 
@@ -361,6 +390,7 @@ function createTestHarness(questions: readonly Question[]) {
       isAnswerSubmitted = false;
       viewMode = 'welcome';
       currentShuffledOptions = [];
+      activePool = [...questions];
     }
   };
 }
@@ -895,6 +925,236 @@ test('15. Next question navigation triggers audio stop to prevent leakage', () =
   handleNext();
   assert.strictEqual(audioStopped, true, 'Audio must be stopped before advancing to next question');
   assert.strictEqual(harness.currentIndex, 1);
+});
+
+// ---------------------------------------------------------
+// 7. PRACTICE MODES, RANGE FILTERING, ACCURACY & INCORRECT PRACTICE TESTS
+// ---------------------------------------------------------
+console.log('\n--- 7. Testing Practice Modes, Range Filtering, Accuracy & Incorrect Practice ---');
+
+test('Fixed presets (10, 20, 50, 80, 90, 100) select exact question counts with continuous IDs 1..N', () => {
+  FIXED_PRESETS.forEach((preset) => {
+    const selected = filterQuestionsByRange(typedQuestions, 1, preset);
+    assert.strictEqual(selected.length, preset, `Preset ${preset} must contain exactly ${preset} questions`);
+    selected.forEach((q, idx) => {
+      assert.strictEqual(q.id, idx + 1, `Preset ${preset} question at index ${idx} must have ID ${idx + 1}`);
+    });
+  });
+});
+
+test('Custom range inclusive filtering: Range 20–40 yields exactly 21 questions with IDs 20..40', () => {
+  const selected = filterQuestionsByRange(typedQuestions, 20, 40);
+  assert.strictEqual(selected.length, 21, 'Range 20–40 must contain exactly 21 questions (inclusive)');
+  assert.strictEqual(selected[0].id, 20, 'First question in range 20–40 must have ID 20');
+  assert.strictEqual(selected[selected.length - 1].id, 40, 'Last question in range 20–40 must have ID 40');
+  selected.forEach((q, idx) => {
+    assert.strictEqual(q.id, 20 + idx, `Question ID must match 20 + ${idx}`);
+  });
+});
+
+test('Custom range boundary edge cases: 1–1 and 100–100 yield single-question subsets', () => {
+  const q1 = filterQuestionsByRange(typedQuestions, 1, 1);
+  assert.strictEqual(q1.length, 1);
+  assert.strictEqual(q1[0].id, 1);
+
+  const q100 = filterQuestionsByRange(typedQuestions, 100, 100);
+  assert.strictEqual(q100.length, 1);
+  assert.strictEqual(q100[0].id, 100);
+});
+
+test('validateRange: Properly validates bounds, integers, and inverted ranges', () => {
+  // Valid cases
+  const valid1 = validateRange(1, 100);
+  assert.strictEqual(valid1.isValid, true);
+  assert.strictEqual(valid1.count, 100);
+
+  const valid2 = validateRange(20, 40);
+  assert.strictEqual(valid2.isValid, true);
+  assert.strictEqual(valid2.count, 21);
+
+  const validSingle = validateRange(5, 5);
+  assert.strictEqual(validSingle.isValid, true);
+  assert.strictEqual(validSingle.count, 1);
+
+  // Inverted range (start > end)
+  const inverted = validateRange(50, 20);
+  assert.strictEqual(inverted.isValid, false);
+  assert.ok(inverted.error?.includes('cannot be greater than End'));
+
+  // Out of bounds
+  const belowMin = validateRange(0, 50);
+  assert.strictEqual(belowMin.isValid, false);
+  assert.ok(belowMin.error?.includes('Start question must be between 1 and 100'));
+
+  const aboveMax = validateRange(1, 101);
+  assert.strictEqual(aboveMax.isValid, false);
+  assert.ok(aboveMax.error?.includes('End question must be between 1 and 100'));
+
+  // Non-integers & NaN
+  const decimal = validateRange(1.5, 10);
+  assert.strictEqual(decimal.isValid, false);
+
+  const nanVal = validateRange(NaN, 10);
+  assert.strictEqual(nanVal.isValid, false);
+});
+
+test('Subset Scoring: Quiz score is calculated dynamically against selected subset size', () => {
+  // 18 correct out of 20 questions = 90%
+  const dummyAnswers: Record<number, UserAnswer> = {};
+  for (let i = 1; i <= 20; i++) {
+    dummyAnswers[i] = {
+      questionId: i,
+      selectedOptionId: 'A',
+      selectedDisplayLabel: 'A',
+      correctOptionId: 'A',
+      correctDisplayLabel: 'A',
+      isCorrect: i <= 18, // 18 true, 2 false
+      shuffledOptions: [],
+      timestamp: i
+    };
+  }
+
+  const stats = calculateQuizStats(dummyAnswers, 20);
+  assert.strictEqual(stats.totalQuestions, 20);
+  assert.strictEqual(stats.answeredCount, 20);
+  assert.strictEqual(stats.correctCount, 18);
+  assert.strictEqual(stats.incorrectCount, 2);
+  assert.strictEqual(stats.scorePercentage, 90);
+  assert.strictEqual(stats.accuracyPercentage, 90);
+  assert.strictEqual(stats.performanceTier.label, 'Outstanding Mastery');
+});
+
+test('Practice Progress Accuracy: Returns 0% when 0 attempted, and reflects attempted accuracy during session', () => {
+  assert.strictEqual(calculateAccuracy(0, 0), 0);
+  assert.strictEqual(calculateAccuracy(0, 5), 0);
+  assert.strictEqual(calculateAccuracy(3, 4), 75);
+  assert.strictEqual(calculateAccuracy(5, 5), 100);
+  assert.strictEqual(calculateAccuracy(2, 3), 66.7);
+
+  // Partial session in calculateQuizStats: 4 answered (3 correct) out of 20 total
+  const partialAnswers: Record<number, UserAnswer> = {
+    1: { questionId: 1, selectedOptionId: 'A', selectedDisplayLabel: 'A', correctOptionId: 'A', correctDisplayLabel: 'A', isCorrect: true, shuffledOptions: [], timestamp: 1 },
+    2: { questionId: 2, selectedOptionId: 'A', selectedDisplayLabel: 'A', correctOptionId: 'A', correctDisplayLabel: 'A', isCorrect: true, shuffledOptions: [], timestamp: 2 },
+    3: { questionId: 3, selectedOptionId: 'A', selectedDisplayLabel: 'A', correctOptionId: 'A', correctDisplayLabel: 'A', isCorrect: true, shuffledOptions: [], timestamp: 3 },
+    4: { questionId: 4, selectedOptionId: 'B', selectedDisplayLabel: 'B', correctOptionId: 'A', correctDisplayLabel: 'A', isCorrect: false, shuffledOptions: [], timestamp: 4 },
+  };
+
+  const partialStats = calculateQuizStats(partialAnswers, 20);
+  assert.strictEqual(partialStats.totalQuestions, 20);
+  assert.strictEqual(partialStats.answeredCount, 4);
+  assert.strictEqual(partialStats.correctCount, 3);
+  assert.strictEqual(partialStats.incorrectCount, 1);
+  assert.strictEqual(partialStats.scorePercentage, 15); // 3 / 20 = 15%
+  assert.strictEqual(partialStats.accuracyPercentage, 75); // 3 / 4 = 75%
+});
+
+test('Active Question Pool & Restart: Restarting a custom range quiz preserves its selected questions', () => {
+  const selectedSubset = filterQuestionsByRange(typedQuestions, 20, 40); // 21 questions
+  const harness = createTestHarness(typedQuestions);
+
+  harness.startQuiz(selectedSubset);
+  assert.strictEqual(harness.questionsList.length, 21);
+  assert.strictEqual(harness.activePool.length, 21);
+
+  // Submit first 2 questions
+  const q0 = harness.currentQuestion!;
+  harness.submitAnswer(q0.correctOptionId);
+  harness.nextQuestion();
+  const q1 = harness.currentQuestion!;
+  harness.submitAnswer(q1.options[0].id);
+
+  assert.strictEqual(Object.keys(harness.userAnswers).length, 2);
+
+  // Restart quiz
+  harness.restart();
+  assert.strictEqual(harness.questionsList.length, 21, 'Restart must keep the exact 21 question subset');
+  assert.strictEqual(harness.currentIndex, 0);
+  assert.strictEqual(Object.keys(harness.userAnswers).length, 0, 'Answers must be reset');
+
+  // Verify all questions belong to range [20, 40]
+  harness.questionsList.forEach((q) => {
+    assert.ok(q.id >= 20 && q.id <= 40, `Question ID ${q.id} must be in range [20, 40]`);
+  });
+});
+
+test('Incorrect Questions Practice: Creates new quiz with only incorrect questions and preserves pool on restart', () => {
+  const subset = typedQuestions.slice(0, 10);
+  const harness = createTestHarness(subset);
+
+  // Answer 6 correctly and 4 incorrectly
+  const wrongIds: number[] = [];
+  for (let i = 0; i < 10; i++) {
+    const q = harness.currentQuestion!;
+    const makeCorrect = i % 2 === 0; // indices 0, 2, 4, 6, 8 correct; 1, 3, 5, 7, 9 incorrect
+    if (makeCorrect) {
+      harness.submitAnswer(q.correctOptionId);
+    } else {
+      const wrongOpt = q.options.find((o) => o.id !== q.correctOptionId)!.id;
+      harness.submitAnswer(wrongOpt);
+      wrongIds.push(q.id);
+    }
+    harness.nextQuestion();
+  }
+
+  assert.strictEqual(harness.viewMode, 'result');
+  assert.strictEqual(wrongIds.length, 5);
+
+  // Start Incorrect Practice
+  harness.startIncorrectPractice();
+  assert.strictEqual(harness.viewMode, 'quiz');
+  assert.strictEqual(harness.questionsList.length, 5, 'Session must have exactly 5 incorrect questions');
+  assert.strictEqual(harness.currentIndex, 0);
+  assert.strictEqual(Object.keys(harness.userAnswers).length, 0);
+
+  // Verify questions match wrongIds
+  const sessionIds = new Set(harness.questionsList.map((q) => q.id));
+  assert.strictEqual(sessionIds.size, 5);
+  wrongIds.forEach((id) => {
+    assert.ok(sessionIds.has(id), `Incorrect session must contain question ID ${id}`);
+  });
+
+  // Verify restart keeps this 5-question pool
+  harness.restart();
+  assert.strictEqual(harness.questionsList.length, 5);
+  harness.questionsList.forEach((q) => {
+    assert.ok(sessionIds.has(q.id));
+  });
+});
+
+test('Zero Incorrect Answers Guard: startIncorrectPractice safely no-ops when 0 incorrect', () => {
+  const subset = typedQuestions.slice(0, 3);
+  const harness = createTestHarness(subset);
+
+  for (let i = 0; i < 3; i++) {
+    const q = harness.currentQuestion!;
+    harness.submitAnswer(q.correctOptionId);
+    harness.nextQuestion();
+  }
+
+  assert.strictEqual(harness.viewMode, 'result');
+  const incorrectCount = Object.values(harness.userAnswers).filter((a) => !a.isCorrect).length;
+  assert.strictEqual(incorrectCount, 0);
+
+  // Call startIncorrectPractice when 0 incorrect
+  harness.startIncorrectPractice();
+  // State remains unchanged in result view
+  assert.strictEqual(harness.viewMode, 'result');
+});
+
+test('Single-Question Quiz Navigation: isFirstQuestion and isLastQuestion are both true', () => {
+  const single = filterQuestionsByRange(typedQuestions, 50, 50);
+  const harness = createTestHarness(single);
+
+  assert.strictEqual(harness.questionsList.length, 1);
+  assert.strictEqual(harness.isFirstQuestion, true);
+  assert.strictEqual(harness.isLastQuestion, true);
+
+  harness.submitAnswer(harness.currentQuestion!.correctOptionId);
+  assert.strictEqual(harness.isAnswerSubmitted, true);
+
+  const advanced = harness.nextQuestion();
+  assert.strictEqual(advanced, true);
+  assert.strictEqual(harness.viewMode, 'result');
 });
 
 // ---------------------------------------------------------

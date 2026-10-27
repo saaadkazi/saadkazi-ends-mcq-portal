@@ -44,6 +44,17 @@ export function getPerformanceTier(percentage: number): PerformanceTier {
 }
 
 /**
+ * Calculates accuracy percentage based on attempted questions.
+ * Returns 0% when answeredCount <= 0.
+ */
+export function calculateAccuracy(correctCount: number, answeredCount: number): number {
+  if (answeredCount <= 0 || correctCount <= 0) {
+    return 0;
+  }
+  return calculatePercentage(correctCount, answeredCount);
+}
+
+/**
  * Aggregates complete analytics from user answers.
  */
 export function calculateQuizStats(
@@ -55,6 +66,7 @@ export function calculateQuizStats(
   const correctCount = answersList.filter((ans) => ans.isCorrect).length;
   const incorrectCount = answeredCount - correctCount;
   const scorePercentage = calculatePercentage(correctCount, totalQuestions);
+  const accuracyPercentage = calculateAccuracy(correctCount, answeredCount);
   const performanceTier = getPerformanceTier(scorePercentage);
 
   return {
@@ -63,6 +75,7 @@ export function calculateQuizStats(
     correctCount,
     incorrectCount,
     scorePercentage,
+    accuracyPercentage,
     performanceTier
   };
 }

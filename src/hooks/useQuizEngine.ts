@@ -38,6 +38,7 @@ export function useQuizEngine(
   initialQuestions: readonly Question[] = DEFAULT_QUESTIONS
 ): QuizEngine {
   const [viewMode, setViewMode] = useState<QuizViewMode>('welcome');
+  const [activePool, setActivePool] = useState<readonly Question[]>(() => [...initialQuestions]);
   const [questions, setQuestions] = useState<Question[]>(() => [...initialQuestions]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [currentShuffledOptions, setCurrentShuffledOptions] = useState<DisplayOption[]>([]);
@@ -59,27 +60,37 @@ export function useQuizEngine(
 
   /**
    * Starts a brand new quiz session with a freshly randomized question order.
+   * Can accept an optional custom subset of questions (e.g. range or incorrect set).
    */
-  const startQuiz = useCallback(() => {
-    const randomized = shuffleArray(initialQuestions);
-    setQuestions(randomized);
-    setCurrentIndex(0);
-    setUserAnswers({});
-    setIsAnswerSubmitted(false);
-    setViewMode('quiz');
+  const startQuiz = useCallback(
+    (customQuestions?: readonly Question[]) => {
+      const poolToUse =
+        customQuestions && customQuestions.length > 0
+          ? [...customQuestions]
+          : [...initialQuestions];
 
-    const optionsMap: Record<number, DisplayOption[]> = {};
-    randomized.forEach((q) => {
-      optionsMap[q.id] = createDisplayOptions(q.options);
-    });
-    setShuffledOptionsMap(optionsMap);
+      setActivePool(poolToUse);
+      const randomized = shuffleArray(poolToUse);
+      setQuestions(randomized);
+      setCurrentIndex(0);
+      setUserAnswers({});
+      setIsAnswerSubmitted(false);
+      setViewMode('quiz');
 
-    if (randomized.length > 0) {
-      setCurrentShuffledOptions(optionsMap[randomized[0].id] ?? []);
-    } else {
-      setCurrentShuffledOptions([]);
-    }
-  }, [initialQuestions]);
+      const optionsMap: Record<number, DisplayOption[]> = {};
+      randomized.forEach((q) => {
+        optionsMap[q.id] = createDisplayOptions(q.options);
+      });
+      setShuffledOptionsMap(optionsMap);
+
+      if (randomized.length > 0) {
+        setCurrentShuffledOptions(optionsMap[randomized[0].id] ?? []);
+      } else {
+        setCurrentShuffledOptions([]);
+      }
+    },
+    [initialQuestions]
+  );
 
   /**
    * Submits an answer for the current question.
@@ -217,11 +228,49 @@ export function useQuizEngine(
   }, []);
 
   /**
-   * Restarts the quiz with all answers cleared and a fresh randomized attempt.
+   * Restarts the quiz with all answers cleared and a fresh randomized attempt
+   * using the currently active pool of questions (presets, custom range, or incorrect set).
    */
   const restartQuiz = useCallback(() => {
-    startQuiz();
-  }, [startQuiz]);
+    const randomized = shuffleArray(activePool);
+    setQuestions(randomized);
+    setCurrentIndex(0);
+    setUserAnswers({});
+    setIsAnswerSubmitted(false);
+    setViewMode('quiz');
+
+    const optionsMap: Record<number, DisplayOption[]> = {};
+    randomized.forEach((q) => {
+      optionsMap[q.id] = createDisplayOptions(q.options);
+    });
+    setShuffledOptionsMap(optionsMap);
+
+    if (randomized.length > 0) {
+      setCurrentShuffledOptions(optionsMap[randomized[0].id] ?? []);
+    } else {
+      setCurrentShuffledOptions([]);
+    }
+  }, [activePool]);
+
+  /**
+   * Starts a brand new practice session targeting only questions answered incorrectly
+   * in the completed session, keeping options shuffled and permanent IDs intact.
+   */
+  const startIncorrectPractice = useCallback(() => {
+    const incorrectIds = new Set(
+      Object.values(userAnswers)
+        .filter((ans) => !ans.isCorrect)
+        .map((ans) => ans.questionId)
+    );
+
+    if (incorrectIds.size === 0) {
+      return;
+    }
+
+    // Select questions using their original Excel IDs before shuffling
+    const incorrectQuestions = initialQuestions.filter((q) => incorrectIds.has(q.id));
+    startQuiz(incorrectQuestions);
+  }, [userAnswers, initialQuestions, startQuiz]);
 
   /**
    * Initiates review mode.
@@ -241,7 +290,8 @@ export function useQuizEngine(
     setIsAnswerSubmitted(false);
     setCurrentShuffledOptions([]);
     setShuffledOptionsMap({});
-  }, []);
+    setActivePool([...initialQuestions]);
+  }, [initialQuestions]);
 
   // Compute analytics
   const stats = useMemo(() => {
@@ -270,6 +320,7 @@ export function useQuizEngine(
     isFirstQuestion,
     isLastQuestion,
     startQuiz,
+    startIncorrectPractice,
     submitAnswer,
     nextQuestion,
     previousQuestion,

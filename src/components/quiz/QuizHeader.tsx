@@ -4,7 +4,10 @@ import { ProgressBar } from '../common/ProgressBar';
 export interface QuizHeaderProps {
   currentIndex: number;
   totalQuestions: number;
+  answeredCount?: number;
   correctCount: number;
+  incorrectCount?: number;
+  accuracyPercentage?: number;
   onQuit?: () => void;
   isMuted?: boolean;
   onToggleMute?: () => void;
@@ -13,7 +16,10 @@ export interface QuizHeaderProps {
 export const QuizHeader: React.FC<QuizHeaderProps> = ({
   currentIndex,
   totalQuestions,
+  answeredCount = 0,
   correctCount,
+  incorrectCount = 0,
+  accuracyPercentage = 0,
   onQuit,
   isMuted = false,
   onToggleMute
@@ -57,6 +63,55 @@ export const QuizHeader: React.FC<QuizHeaderProps> = ({
         </div>
       </div>
       <ProgressBar current={currentNumber} total={totalQuestions} label={`Question ${currentNumber} of ${totalQuestions}`} />
+
+      {/* Real-time Session Practice Progress */}
+      <div
+        className="quiz-progress-stats"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '0.5rem',
+          marginTop: '0.75rem',
+          padding: '0.5rem 0.75rem',
+          backgroundColor: 'var(--bg-surface)',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--border-subtle)',
+          textAlign: 'center'
+        }}
+      >
+        <div>
+          <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            Attempted
+          </span>
+          <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+            {answeredCount}/{totalQuestions}
+          </span>
+        </div>
+        <div>
+          <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            Correct
+          </span>
+          <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-success-solid)' }}>
+            {correctCount}
+          </span>
+        </div>
+        <div>
+          <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            Incorrect
+          </span>
+          <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-danger-solid)' }}>
+            {incorrectCount}
+          </span>
+        </div>
+        <div>
+          <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            Accuracy
+          </span>
+          <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-primary)' }}>
+            {accuracyPercentage}%
+          </span>
+        </div>
+      </div>
     </header>
   );
 };
