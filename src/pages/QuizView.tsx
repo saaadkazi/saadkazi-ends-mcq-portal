@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { OptionId, QuizEngine } from '../types/quiz';
 import { useAnswerSound, type UseAnswerSoundResult } from '../hooks/useAnswerSound';
+import { useQuizKeyboard } from '../utils/keyboard';
 import { QuizHeader } from '../components/quiz/QuizHeader';
 import { QuestionCard } from '../components/quiz/QuestionCard';
 import { OptionList } from '../components/quiz/OptionList';
@@ -102,6 +103,18 @@ export const QuizView: React.FC<QuizViewProps> = ({ engine, sound: propSound }) 
     }
   };
 
+  // Register keyboard-driven MCQ controls (A/B/C/D, Enter, ArrowLeft, ArrowRight)
+  useQuizKeyboard({
+    options: currentShuffledOptions,
+    isSubmitted: isAnswerSubmitted,
+    selectedOptionId,
+    onSelectOption: handleSelectOption,
+    onSubmit: handleSubmit,
+    onNext: handleNext,
+    onPrevious: handlePrevious,
+    isFirstQuestion
+  });
+
   // Find correct & selected option objects for feedback display
   const correctAnswerOption = currentShuffledOptions.find(
     (o) => o.id === currentQuestion.correctOptionId
@@ -178,6 +191,23 @@ export const QuizView: React.FC<QuizViewProps> = ({ engine, sound: propSound }) 
             {isLastQuestion ? 'Finish & View Results' : 'Next Question \u2192'}
           </Button>
         )}
+      </div>
+
+      <div
+        className="quiz-shortcut-hint"
+        style={{
+          textAlign: 'center',
+          fontSize: '0.75rem',
+          color: 'var(--text-muted)',
+          paddingTop: '0.1rem',
+          letterSpacing: '0.02em',
+          userSelect: 'none'
+        }}
+        aria-label="Keyboard shortcuts: A through D to select option, Enter to submit or advance, Left and Right arrows to navigate"
+      >
+        <span aria-hidden="true">
+          <kbd style={{ fontFamily: 'inherit', fontWeight: 600 }}>A</kbd>–<kbd style={{ fontFamily: 'inherit', fontWeight: 600 }}>D</kbd>: Select Option &nbsp;|&nbsp; <kbd style={{ fontFamily: 'inherit', fontWeight: 600 }}>Enter</kbd>: Submit / Next &nbsp;|&nbsp; <kbd style={{ fontFamily: 'inherit', fontWeight: 600 }}>←</kbd> <kbd style={{ fontFamily: 'inherit', fontWeight: 600 }}>→</kbd>: Navigate
+        </span>
       </div>
     </div>
   );

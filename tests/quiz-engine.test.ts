@@ -12,6 +12,12 @@ import {
   selectNextIncorrectSound,
   stopAudioSafely
 } from '../src/utils/sound';
+import {
+  handleQuizKeyboardAction,
+  isEditableOrNativeControl,
+  type KeyboardEventLike,
+  type QuizKeyboardContext
+} from '../src/utils/keyboard';
 
 let passedTests = 0;
 let failedTests = 0;
@@ -1421,6 +1427,360 @@ test('Section 8.10: Single-question range works in both modes', () => {
   assert.strictEqual(shufHarness.currentQuestion!.id, 42);
   assert.strictEqual(shufHarness.isFirstQuestion, true);
   assert.strictEqual(shufHarness.isLastQuestion, true);
+});
+
+// ---------------------------------------------------------
+// 10. KEYBOARD-DRIVEN MCQ CONTROLS TESTS
+// ---------------------------------------------------------
+console.log('\n--- 10. Testing Keyboard-Driven MCQ Controls ---');
+
+function createTestKeyboardContext(overrides: Partial<QuizKeyboardContext> = {}): {
+  context: QuizKeyboardContext;
+  selectedIds: OptionId[];
+  getSubmitCount: () => number;
+  getNextCount: () => number;
+  getPrevCount: () => number;
+} {
+  const selectedIds: OptionId[] = [];
+  let submitCount = 0;
+  let nextCount = 0;
+  let prevCount = 0;
+
+  const defaultOptions: DisplayOption[] = [
+    { id: 'C', displayLabel: 'A', text: 'Shuffled Option at Visual A' },
+    { id: 'A', displayLabel: 'B', text: 'Shuffled Option at Visual B' },
+    { id: 'D', displayLabel: 'C', text: 'Shuffled Option at Visual C' },
+    { id: 'B', displayLabel: 'D', text: 'Shuffled Option at Visual D' }
+  ];
+
+  const context: QuizKeyboardContext = {
+    options: defaultOptions,
+    isSubmitted: false,
+    selectedOptionId: null,
+    onSelectOption: (id) => selectedIds.push(id),
+    onSubmit: () => submitCount++,
+    onNext: () => nextCount++,
+    onPrevious: () => prevCount++,
+    isFirstQuestion: false,
+    ...overrides
+  };
+
+  return {
+    context,
+    selectedIds,
+    getSubmitCount: () => submitCount,
+    getNextCount: () => nextCount,
+    getPrevCount: () => prevCount
+  };
+}
+
+function createMockEvent(overrides: Partial<KeyboardEventLike> = {}): {
+  event: KeyboardEventLike;
+  isDefaultPrevented: () => boolean;
+} {
+  let defaultPrevented = false;
+  const event: KeyboardEventLike = {
+    key: 'a',
+    repeat: false,
+    ctrlKey: false,
+    altKey: false,
+    metaKey: false,
+    preventDefault: () => {
+      defaultPrevented = true;
+    },
+    ...overrides
+  };
+  return {
+    event,
+    isDefaultPrevented: () => defaultPrevented
+  };
+}
+
+test('Keyboard 1: Visual-label mapping when displayed labels differ from permanent option IDs (Shuffle Mode)', () => {
+  const { context, selectedIds } = createTestKeyboardContext();
+
+  // In test context: visual A -> ID 'C', visual B -> ID 'A', visual C -> ID 'D', visual D -> ID 'B'
+  const mockA = createMockEvent({ key: 'A' });
+  const handledA = handleQuizKeyboardAction(mockA.event, context);
+  assert.strictEqual(handledA, true);
+  assert.strictEqual(mockA.isDefaultPrevented(), true);
+  assert.strictEqual(selectedIds[0], 'C', 'Pressing A must select option with visual displayLabel A (id C)');
+
+  const mockB = createMockEvent({ key: 'B' });
+  const handledB = handleQuizKeyboardAction(mockB.event, context);
+  assert.strictEqual(handledB, true);
+  assert.strictEqual(selectedIds[1], 'A', 'Pressing B must select option with visual displayLabel B (id A)');
+
+  const mockC = createMockEvent({ key: 'C' });
+  const handledC = handleQuizKeyboardAction(mockC.event, context);
+  assert.strictEqual(handledC, true);
+  assert.strictEqual(selectedIds[2], 'D', 'Pressing C must select option with visual displayLabel C (id D)');
+
+  const mockD = createMockEvent({ key: 'D' });
+  const handledD = handleQuizKeyboardAction(mockD.event, context);
+  assert.strictEqual(handledD, true);
+  assert.strictEqual(selectedIds[3], 'B', 'Pressing D must select option with visual displayLabel D (id B)');
+});
+
+test('Keyboard 2: Original-order option mapping (Original Order Mode)', () => {
+  const origOptions: DisplayOption[] = [
+    { id: 'A', displayLabel: 'A', text: 'Option A' },
+    { id: 'B', displayLabel: 'B', text: 'Option B' },
+    { id: 'C', displayLabel: 'C', text: 'Option C' },
+    { id: 'D', displayLabel: 'D', text: 'Option D' }
+  ];
+  const { context, selectedIds } = createTestKeyboardContext({ options: origOptions });
+
+  ['A', 'B', 'C', 'D'].forEach((key, idx) => {
+    const mock = createMockEvent({ key });
+    const handled = handleQuizKeyboardAction(mock.event, context);
+    assert.strictEqual(handled, true);
+    assert.strictEqual(mock.isDefaultPrevented(), true);
+    assert.strictEqual(selectedIds[idx], key, `Pressing ${key} in original mode must select option ID ${key}`);
+  });
+});
+
+test('Keyboard 3: Case-insensitive A/B/C/D handling', () => {
+  const { context, selectedIds } = createTestKeyboardContext();
+
+  const mockA = createMockEvent({ key: 'a' });
+  assert.strictEqual(handleQuizKeyboardAction(mockA.event, context), true);
+  assert.strictEqual(selectedIds[0], 'C');
+
+  const mockB = createMockEvent({ key: 'b' });
+  assert.strictEqual(handleQuizKeyboardAction(mockB.event, context), true);
+  assert.strictEqual(selectedIds[1], 'A');
+
+  const mockC = createMockEvent({ key: 'c' });
+  assert.strictEqual(handleQuizKeyboardAction(mockC.event, context), true);
+  assert.strictEqual(selectedIds[2], 'D');
+
+  const mockD = createMockEvent({ key: 'd' });
+  assert.strictEqual(handleQuizKeyboardAction(mockD.event, context), true);
+  assert.strictEqual(selectedIds[3], 'B');
+});
+
+test('Keyboard 4: Ignoring selection after submission (Answer Locking)', () => {
+  const { context, selectedIds } = createTestKeyboardContext({ isSubmitted: true });
+
+  ['A', 'B', 'C', 'D', 'a', 'b', 'c', 'd'].forEach((key) => {
+    const mock = createMockEvent({ key });
+    const handled = handleQuizKeyboardAction(mock.event, context);
+    assert.strictEqual(handled, false, `Key ${key} must not be handled when answer is already submitted`);
+    assert.strictEqual(mock.isDefaultPrevented(), false, 'Default must not be prevented for ignored key');
+  });
+
+  assert.strictEqual(selectedIds.length, 0, 'No options should have been selected after submission');
+});
+
+test('Keyboard 5: Enter submission with and without a selected answer', () => {
+  // Case A: No answer selected -> Enter must do nothing
+  const { context: ctxNoSel, getSubmitCount: getSubmitCountNoSel } = createTestKeyboardContext({
+    isSubmitted: false,
+    selectedOptionId: null
+  });
+  const mockEnterNoSel = createMockEvent({ key: 'Enter' });
+  const handledNoSel = handleQuizKeyboardAction(mockEnterNoSel.event, ctxNoSel);
+  assert.strictEqual(handledNoSel, false, 'Enter must do nothing when no answer is selected');
+  assert.strictEqual(mockEnterNoSel.isDefaultPrevented(), false);
+  assert.strictEqual(getSubmitCountNoSel(), 0);
+
+  // Case B: Answer selected -> Enter must submit
+  const { context: ctxWithSel, getSubmitCount: getSubmitCountWithSel } = createTestKeyboardContext({
+    isSubmitted: false,
+    selectedOptionId: 'C'
+  });
+  const mockEnterWithSel = createMockEvent({ key: 'Enter' });
+  const handledWithSel = handleQuizKeyboardAction(mockEnterWithSel.event, ctxWithSel);
+  assert.strictEqual(handledWithSel, true, 'Enter must submit when an answer is selected');
+  assert.strictEqual(mockEnterWithSel.isDefaultPrevented(), true);
+  assert.strictEqual(getSubmitCountWithSel(), 1);
+});
+
+test('Keyboard 6: Enter progression after submission, including final-question result transition', () => {
+  // Intermediate progression
+  const { context: ctxSubmitted, getNextCount } = createTestKeyboardContext({
+    isSubmitted: true
+  });
+  const mockEnter = createMockEvent({ key: 'Enter' });
+  const handled = handleQuizKeyboardAction(mockEnter.event, ctxSubmitted);
+  assert.strictEqual(handled, true);
+  assert.strictEqual(mockEnter.isDefaultPrevented(), true);
+  assert.strictEqual(getNextCount(), 1);
+
+  // Full integration test on final question of quiz engine
+  const harness = createTestHarness(typedQuestions.slice(0, 2));
+  assert.strictEqual(harness.currentIndex, 0);
+
+  // Q0: Select and submit via keyboard simulation
+  const q0Options = harness.currentShuffledOptions;
+  const q0Ctx: QuizKeyboardContext = {
+    options: q0Options,
+    isSubmitted: harness.isAnswerSubmitted,
+    selectedOptionId: q0Options[0].id,
+    onSelectOption: (id) => harness.submitAnswer(id),
+    onSubmit: () => harness.submitAnswer(q0Options[0].id),
+    onNext: () => harness.nextQuestion(),
+    onPrevious: () => harness.previousQuestion(),
+    isFirstQuestion: harness.isFirstQuestion
+  };
+  handleQuizKeyboardAction(createMockEvent({ key: 'Enter' }).event, q0Ctx);
+  assert.strictEqual(harness.isAnswerSubmitted, true);
+
+  // Advance to Q1 (final question)
+  q0Ctx.isSubmitted = harness.isAnswerSubmitted;
+  handleQuizKeyboardAction(createMockEvent({ key: 'Enter' }).event, q0Ctx);
+  assert.strictEqual(harness.currentIndex, 1);
+  assert.strictEqual(harness.isLastQuestion, true);
+
+  // Q1: Submit final question
+  const q1Options = harness.currentShuffledOptions;
+  const q1Ctx: QuizKeyboardContext = {
+    options: q1Options,
+    isSubmitted: harness.isAnswerSubmitted,
+    selectedOptionId: q1Options[0].id,
+    onSelectOption: (id) => harness.submitAnswer(id),
+    onSubmit: () => harness.submitAnswer(q1Options[0].id),
+    onNext: () => harness.nextQuestion(),
+    onPrevious: () => harness.previousQuestion(),
+    isFirstQuestion: harness.isFirstQuestion
+  };
+  handleQuizKeyboardAction(createMockEvent({ key: 'Enter' }).event, q1Ctx);
+  assert.strictEqual(harness.isAnswerSubmitted, true);
+
+  // Press Enter on submitted final question -> Transitions to result view
+  q1Ctx.isSubmitted = harness.isAnswerSubmitted;
+  handleQuizKeyboardAction(createMockEvent({ key: 'Enter' }).event, q1Ctx);
+  assert.strictEqual(harness.viewMode, 'result', 'Enter on final question must transition to result mode');
+});
+
+test('Keyboard 7: Left-arrow navigation and the first-question boundary', () => {
+  // Case A: First question boundary (isFirstQuestion: true)
+  const { context: ctxFirst, getPrevCount: getPrevFirst } = createTestKeyboardContext({
+    isFirstQuestion: true
+  });
+  const mockLeftFirst = createMockEvent({ key: 'ArrowLeft' });
+  const handledFirst = handleQuizKeyboardAction(mockLeftFirst.event, ctxFirst);
+  assert.strictEqual(handledFirst, false, 'ArrowLeft must do nothing on first question');
+  assert.strictEqual(mockLeftFirst.isDefaultPrevented(), false);
+  assert.strictEqual(getPrevFirst(), 0);
+
+  // Case B: Subsequent questions (isFirstQuestion: false)
+  const { context: ctxSub, getPrevCount: getPrevSub } = createTestKeyboardContext({
+    isFirstQuestion: false
+  });
+  const mockLeftSub = createMockEvent({ key: 'ArrowLeft' });
+  const handledSub = handleQuizKeyboardAction(mockLeftSub.event, ctxSub);
+  assert.strictEqual(handledSub, true, 'ArrowLeft must navigate previous on Q2+');
+  assert.strictEqual(mockLeftSub.isDefaultPrevented(), true);
+  assert.strictEqual(getPrevSub(), 1);
+});
+
+test('Keyboard 8: Right-arrow blocking before submission and permitted progression after submission', () => {
+  // Case A: Unsubmitted question -> Blocked
+  const { context: ctxUnsub, getNextCount: getNextUnsub } = createTestKeyboardContext({
+    isSubmitted: false
+  });
+  const mockRightUnsub = createMockEvent({ key: 'ArrowRight' });
+  const handledUnsub = handleQuizKeyboardAction(mockRightUnsub.event, ctxUnsub);
+  assert.strictEqual(handledUnsub, false, 'ArrowRight must be blocked before answer submission');
+  assert.strictEqual(mockRightUnsub.isDefaultPrevented(), false);
+  assert.strictEqual(getNextUnsub(), 0);
+
+  // Case B: Submitted question -> Permitted
+  const { context: ctxSub, getNextCount: getNextSub } = createTestKeyboardContext({
+    isSubmitted: true
+  });
+  const mockRightSub = createMockEvent({ key: 'ArrowRight' });
+  const handledSub = handleQuizKeyboardAction(mockRightSub.event, ctxSub);
+  assert.strictEqual(handledSub, true, 'ArrowRight must advance when answer is submitted');
+  assert.strictEqual(mockRightSub.isDefaultPrevented(), true);
+  assert.strictEqual(getNextSub(), 1);
+});
+
+test('Keyboard 9: Repeated-key suppression', () => {
+  const { context, getSubmitCount } = createTestKeyboardContext({
+    isSubmitted: false,
+    selectedOptionId: 'A'
+  });
+
+  const mockRepeatEnter = createMockEvent({ key: 'Enter', repeat: true });
+  const handled = handleQuizKeyboardAction(mockRepeatEnter.event, context);
+  assert.strictEqual(handled, false, 'Repeated keydown event must be ignored');
+  assert.strictEqual(mockRepeatEnter.isDefaultPrevented(), false);
+  assert.strictEqual(getSubmitCount(), 0);
+
+  const mockRepeatA = createMockEvent({ key: 'A', repeat: true });
+  assert.strictEqual(handleQuizKeyboardAction(mockRepeatA.event, context), false);
+});
+
+test('Keyboard 10: Modifier combinations and editable/interactive element guards', () => {
+  const { context, getSubmitCount, selectedIds } = createTestKeyboardContext({
+    isSubmitted: false,
+    selectedOptionId: 'A'
+  });
+
+  // Modifiers
+  assert.strictEqual(handleQuizKeyboardAction(createMockEvent({ key: 'A', ctrlKey: true }).event, context), false);
+  assert.strictEqual(handleQuizKeyboardAction(createMockEvent({ key: 'Enter', altKey: true }).event, context), false);
+  assert.strictEqual(handleQuizKeyboardAction(createMockEvent({ key: 'ArrowRight', metaKey: true }).event, context), false);
+  assert.strictEqual(selectedIds.length, 0);
+  assert.strictEqual(getSubmitCount(), 0);
+
+  // Inputs & editable elements
+  assert.strictEqual(isEditableOrNativeControl({ tagName: 'INPUT' }, 'A'), true);
+  assert.strictEqual(isEditableOrNativeControl({ tagName: 'TEXTAREA' }, 'Enter'), true);
+  assert.strictEqual(isEditableOrNativeControl({ tagName: 'SELECT' }, 'ArrowRight'), true);
+  assert.strictEqual(isEditableOrNativeControl({ isContentEditable: true }, 'Enter'), true);
+
+  const inputMock = createMockEvent({ key: 'A', target: { tagName: 'INPUT' } });
+  assert.strictEqual(handleQuizKeyboardAction(inputMock.event, context), false);
+  assert.strictEqual(inputMock.isDefaultPrevented(), false);
+
+  // Dedicated native buttons (Previous button, Header action buttons)
+  assert.strictEqual(isEditableOrNativeControl({ tagName: 'BUTTON', id: 'quiz-prev-btn' }, 'Enter'), true);
+  assert.strictEqual(isEditableOrNativeControl({ tagName: 'BUTTON', classList: { contains: (cls: string) => cls === 'header-action-btn' } }, 'Enter'), true);
+  
+  // Submit & Option buttons do not block Enter
+  assert.strictEqual(isEditableOrNativeControl({ tagName: 'BUTTON', id: 'quiz-submit-btn' }, 'Enter'), false);
+  assert.strictEqual(isEditableOrNativeControl({ tagName: 'BUTTON', className: 'option-item' }, 'Enter'), false);
+});
+
+test('Keyboard 11: Single execution per event without duplicate submission or double scoring', () => {
+  const harness = createTestHarness(typedQuestions.slice(0, 5));
+  const q0 = harness.currentQuestion!;
+
+  let submitCalls = 0;
+  const mockSubmit = () => {
+    submitCalls++;
+    harness.submitAnswer(q0.correctOptionId);
+  };
+
+  const context: QuizKeyboardContext = {
+    options: harness.currentShuffledOptions,
+    isSubmitted: harness.isAnswerSubmitted,
+    selectedOptionId: q0.correctOptionId,
+    onSelectOption: () => {},
+    onSubmit: mockSubmit,
+    onNext: () => harness.nextQuestion(),
+    onPrevious: () => harness.previousQuestion(),
+    isFirstQuestion: harness.isFirstQuestion
+  };
+
+  const mockEnter = createMockEvent({ key: 'Enter' });
+  const handled = handleQuizKeyboardAction(mockEnter.event, context);
+  assert.strictEqual(handled, true);
+  assert.strictEqual(submitCalls, 1);
+  assert.strictEqual(harness.isAnswerSubmitted, true);
+  assert.strictEqual(Object.keys(harness.userAnswers).length, 1);
+
+  // Attempting second Enter on the same event/context is blocked by isSubmitted
+  context.isSubmitted = harness.isAnswerSubmitted;
+  let nextCalls = 0;
+  context.onNext = () => nextCalls++;
+  handleQuizKeyboardAction(createMockEvent({ key: 'Enter' }).event, context);
+  assert.strictEqual(submitCalls, 1, 'Submit must not be called a second time');
+  assert.strictEqual(nextCalls, 1, 'Subsequent Enter calls advance, not submit');
 });
 
 // ---------------------------------------------------------
